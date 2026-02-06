@@ -9,6 +9,11 @@
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">Dashboard</a>
                 </li>
+                @if (Auth::user()->isAdmin())
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">Categories</a>
+                    </li>
+                @endif
             </ul>
             <ul class="navbar-nav ms-auto align-items-lg-center">
                 <li class="nav-item dropdown">
