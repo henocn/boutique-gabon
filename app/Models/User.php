@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -60,5 +61,10 @@ class User extends Authenticatable
     public function isManager(): bool
     {
         return $this->role === self::ROLE_MANAGER;
+    }
+
+    public function managedProducts(): HasMany
+    {
+        return $this->hasMany(Product::class, 'manager_id');
     }
 }
