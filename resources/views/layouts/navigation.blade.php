@@ -13,6 +13,9 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.categories.*') ? 'active' : '' }}" href="{{ route('admin.categories.index') }}">Categories</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">Produits</a>
+                    </li>
                 @endif
             </ul>
             <ul class="navbar-nav ms-auto align-items-lg-center">
