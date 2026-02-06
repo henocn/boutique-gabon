@@ -16,6 +16,9 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('admin.products.*') ? 'active' : '' }}" href="{{ route('admin.products.index') }}">Produits</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}" href="{{ route('admin.users.index') }}">Utilisateurs</a>
+                    </li>
                 @endif
             </ul>
             <ul class="navbar-nav ms-auto align-items-lg-center">
