@@ -78,17 +78,25 @@
                     <a class="text-brand fw-semibold" href="#products">Voir tout</a>
                 </div>
                 <div class="row g-3">
-                    @for ($i = 0; $i < 4; $i++)
+                    @forelse ($categories as $category)
                         <div class="col-6 col-lg-3">
                             <div class="card card-soft p-3">
-                                <div class="ratio ratio-4x3 bg-light rounded-4"></div>
+                                <div class="ratio ratio-4x3 bg-light rounded-4 overflow-hidden">
+                                    @if ($category->image_path)
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($category->image_path) }}" alt="{{ $category->name }}" class="w-100 h-100 object-fit-cover">
+                                    @endif
+                                </div>
                                 <div class="mt-3">
-                                    <p class="fw-semibold mb-1">Categorie {{ $i + 1 }}</p>
-                                    <p class="text-muted small mb-0">Description courte</p>
+                                    <p class="fw-semibold mb-1">{{ $category->name }}</p>
+                                    <p class="text-muted small mb-0">{{ \Illuminate\Support\Str::limit($category->description, 60) }}</p>
                                 </div>
                             </div>
                         </div>
-                    @endfor
+                    @empty
+                        <div class="col-12">
+                            <div class="alert alert-light">Aucune categorie pour le moment.</div>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </section>
@@ -103,21 +111,32 @@
                     </form>
                 </div>
                 <div class="row g-3">
-                    @for ($i = 0; $i < 6; $i++)
+                    @forelse ($products as $product)
+                        @php
+                            $firstImage = $product->images->sortBy('position')->first();
+                        @endphp
                         <div class="col-6 col-lg-4">
                             <div class="card card-soft p-3 h-100">
-                                <div class="ratio ratio-4x3 bg-light rounded-4"></div>
+                                <div class="ratio ratio-4x3 bg-light rounded-4 overflow-hidden">
+                                    @if ($firstImage)
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($firstImage->path) }}" alt="{{ $product->name }}" class="w-100 h-100 object-fit-cover">
+                                    @endif
+                                </div>
                                 <div class="mt-3">
-                                    <p class="fw-semibold mb-1">Produit {{ $i + 1 }}</p>
-                                    <p class="text-muted small mb-2">Livraison rapide</p>
+                                    <p class="fw-semibold mb-1">{{ $product->name }}</p>
+                                    <p class="text-muted small mb-2">{{ $product->category?->name }}</p>
                                     <div class="d-flex align-items-center justify-content-between">
-                                        <span class="fw-bold">12 000 FCFA</span>
+                                        <span class="fw-bold">{{ number_format($product->price_sell, 0, ',', ' ') }} FCFA</span>
                                         <button class="btn btn-sm btn-brand" type="button">Ajouter</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    @endfor
+                    @empty
+                        <div class="col-12">
+                            <div class="alert alert-light">Aucun produit pour le moment.</div>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </section>
