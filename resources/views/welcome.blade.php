@@ -84,9 +84,12 @@
                         @endphp
                         <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                             <div class="card product-card h-100">
-                                <div class="ratio ratio-4x3 bg-light overflow-hidden">
+                                <div class="ratio ratio-4x3 bg-light overflow-hidden position-relative">
                                     @if ($firstImage)
                                         <img src="{{ \Illuminate\Support\Facades\Storage::url($firstImage->path) }}" alt="{{ $product->name }}" class="w-100 h-100 object-fit-cover">
+                                    @endif
+                                    @if ($product->category)
+                                        <span class="badge product-badge">{{ $product->category->name }}</span>
                                     @endif
                                 </div>
                                 <div class="product-body">

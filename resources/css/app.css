@@ -99,6 +99,18 @@ body {
 	overflow: hidden;
 }
 
+.product-badge {
+	position: absolute;
+	top: 0.75rem;
+	left: 0.75rem;
+	background: rgba(47, 111, 109, 0.92);
+	color: #fff;
+	font-weight: 600;
+	letter-spacing: 0.2px;
+	padding: 0.35rem 0.6rem;
+	border-radius: 999px;
+}
+
 .product-body {
 	padding: 0.85rem 1rem 1rem;
 }
