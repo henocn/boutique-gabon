@@ -101,14 +101,18 @@ body {
 
 .product-badge {
 	position: absolute;
-	top: 0.75rem;
-	left: 0.75rem;
-	background: rgba(47, 111, 109, 0.92);
-	color: #fff;
-	font-weight: 600;
+	top: 0.6rem;
+	left: 0.6rem;
+	background: rgba(255, 255, 255, 0.92);
+	color: var(--accent-500);
+	font-weight: 700;
+	font-size: 0.75rem;
 	letter-spacing: 0.2px;
-	padding: 0.35rem 0.6rem;
+	padding: 0.3rem 0.6rem;
 	border-radius: 999px;
+	box-shadow: 0 6px 14px rgba(27, 31, 36, 0.12);
+	border: 1px solid rgba(47, 111, 109, 0.2);
+	backdrop-filter: blur(6px);
 }
 
 .product-body {
