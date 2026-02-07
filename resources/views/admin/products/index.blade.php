@@ -30,7 +30,7 @@
                     @forelse ($products as $product)
                         <tr>
                             <td>
-                                @php($thumb = $product->images->first())
+                                @php($thumb = $product->productImages->first())
                                 @if ($thumb)
                                     <img src="{{ \Illuminate\Support\Facades\Storage::url($thumb->path) }}" alt="Image" width="48" height="48" class="rounded border">
                                 @else

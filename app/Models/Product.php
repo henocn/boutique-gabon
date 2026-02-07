@@ -62,9 +62,9 @@ class Product extends Model
         return $this->belongsTo(User::class, 'manager_id');
     }
 
-    public function images(): HasMany
+    public function productImages(): HasMany
     {
-        return $this->hasMany(ProductImage::class);
+        return $this->hasMany(ProductImage::class)->orderBy('position');
     }
 
     public function orders(): HasMany

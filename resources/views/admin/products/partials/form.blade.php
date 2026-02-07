@@ -78,11 +78,11 @@
             <label class="form-label">Apercu des images</label>
             <div class="d-flex flex-wrap gap-2" id="selected-images-list"></div>
         </div>
-        @if ($product->exists && $product->images?->isNotEmpty())
+        @if ($product->exists && $product->productImages?->isNotEmpty())
             <div class="mb-3">
                 <label class="form-label">Images existantes</label>
                 <div class="d-flex flex-wrap gap-2">
-                    @foreach ($product->images as $image)
+                    @foreach ($product->productImages as $image)
                         <div class="position-relative border rounded p-2">
                             <input class="btn-check" type="checkbox" name="remove_images[]" value="{{ $image->id }}" id="remove_image_{{ $image->id }}">
                             <label class="btn btn-sm btn-danger position-absolute top-0 start-0 m-1" for="remove_image_{{ $image->id }}" title="Supprimer">

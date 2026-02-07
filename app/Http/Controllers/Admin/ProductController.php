@@ -20,7 +20,7 @@ class ProductController extends Controller
     public function index(): View
     {
         $products = Product::query()
-            ->with(['category', 'manager', 'images'])
+            ->with(['category', 'manager', 'productImages'])
             ->latest()
             ->paginate(15);
 
@@ -73,7 +73,7 @@ class ProductController extends Controller
 
     public function edit(Product $product): View
     {
-        $product->load('images');
+        $product->load('productImages');
         $categories = Category::query()->orderBy('name')->get();
         $managers = User::query()
             ->where('role', User::ROLE_MANAGER)
@@ -94,7 +94,7 @@ class ProductController extends Controller
             static fn ($file) => $file && $file->isValid()
         ));
 
-        $remainingCount = $product->images()
+        $remainingCount = $product->productImages()
             ->whereNotIn('id', $removeImages->all())
             ->count();
 
@@ -104,7 +104,7 @@ class ProductController extends Controller
 
         DB::transaction(function () use ($product, $data, $removeImages, $newImages): void {
             if ($removeImages->isNotEmpty()) {
-                $imagesToRemove = $product->images()->whereIn('id', $removeImages)->get();
+                $imagesToRemove = $product->productImages()->whereIn('id', $removeImages)->get();
                 foreach ($imagesToRemove as $image) {
                     Storage::disk('public')->delete($image->path);
                     $image->delete();
@@ -113,7 +113,7 @@ class ProductController extends Controller
 
             $product->update($data);
 
-            $startPosition = $product->images()->max('position') ?? 0;
+            $startPosition = $product->productImages()->max('position') ?? 0;
             foreach ($newImages as $index => $image) {
                 $path = $image->store('products', 'public');
                 ProductImage::create([
@@ -131,9 +131,9 @@ class ProductController extends Controller
 
     public function destroy(Product $product): RedirectResponse
     {
-        $product->load('images');
+        $product->load('productImages');
 
-        foreach ($product->images as $image) {
+        foreach ($product->productImages as $image) {
             Storage::disk('public')->delete($image->path);
         }
 

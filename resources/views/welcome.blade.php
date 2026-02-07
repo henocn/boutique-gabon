@@ -113,7 +113,7 @@
                 <div class="row g-3">
                     @forelse ($products as $product)
                         @php
-                            $firstImage = $product->images->sortBy('position')->first();
+                            $firstImage = $product->productImages->first();
                         @endphp
                         <div class="col-6 col-lg-4">
                             <div class="card card-soft p-3 h-100">
