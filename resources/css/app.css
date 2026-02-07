@@ -113,6 +113,12 @@ body {
 	box-shadow: 0 6px 14px rgba(27, 31, 36, 0.12);
 	border: 1px solid rgba(47, 111, 109, 0.2);
 	backdrop-filter: blur(6px);
+	display: inline-flex;
+	max-width: calc(100% - 1.2rem);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	line-height: 1.2;
 }
 
 .product-body {
