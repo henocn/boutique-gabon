@@ -26,7 +26,7 @@ class ProductStoreRequest extends FormRequest
             'stock' => ['required', 'integer', 'min:0'],
             'status' => ['required', Rule::in(array_map(fn (ProductStatus $s) => $s->value, ProductStatus::cases()))],
             'images' => ['nullable', 'array', 'max:5'],
-            'images.*' => ['image', 'max:2048'],
+            'images.*' => ['file', 'mimes:jpg,jpeg,png,webp,gif,jfif', 'max:2048'],
         ];
     }
 }

@@ -44,7 +44,10 @@ class ProductController extends Controller
     public function store(ProductStoreRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $images = $request->file('images', []);
+        $images = array_values(array_filter(
+            $request->file('images', []),
+            static fn ($file) => $file && $file->isValid()
+        ));
 
         if (count($images) > 5) {
             return back()->withErrors(['images' => 'Maximum 5 images.'])->withInput();
@@ -86,7 +89,10 @@ class ProductController extends Controller
     {
         $data = $request->validated();
         $removeImages = collect($request->input('remove_images', []))->map('intval');
-        $newImages = $request->file('images', []);
+        $newImages = array_values(array_filter(
+            $request->file('images', []),
+            static fn ($file) => $file && $file->isValid()
+        ));
 
         $remainingCount = $product->images()
             ->whereNotIn('id', $removeImages->all())

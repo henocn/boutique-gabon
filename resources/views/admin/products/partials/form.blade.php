@@ -74,7 +74,11 @@
             <label class="form-label" for="images">Images (max 5)</label>
             <input id="images" name="images[]" type="file" class="form-control" accept="image/*" multiple>
         </div>
-        @if ($product->exists && $product->images->isNotEmpty())
+        <div class="mb-3 d-none" id="selected-images">
+            <label class="form-label">Apercu des images</label>
+            <div class="d-flex flex-wrap gap-2" id="selected-images-list"></div>
+        </div>
+        @if ($product->exists && $product->images?->isNotEmpty())
             <div class="mb-3">
                 <label class="form-label">Images existantes</label>
                 <div class="d-flex flex-wrap gap-2">
@@ -97,3 +101,41 @@
     <button class="btn btn-brand" type="submit">{{ $submitLabel }}</button>
     <a class="btn btn-outline-secondary" href="{{ route('admin.products.index') }}">Annuler</a>
 </div>
+
+@push('scripts')
+<script>
+    (function () {
+        var input = document.getElementById('images');
+        var container = document.getElementById('selected-images');
+        var list = document.getElementById('selected-images-list');
+
+        if (!input || !container || !list) {
+            return;
+        }
+
+        input.addEventListener('change', function () {
+            list.innerHTML = '';
+
+            if (!input.files || input.files.length === 0) {
+                container.classList.add('d-none');
+                return;
+            }
+
+            Array.from(input.files).forEach(function (file) {
+                var url = URL.createObjectURL(file);
+                var img = document.createElement('img');
+                img.src = url;
+                img.width = 72;
+                img.height = 72;
+                img.className = 'rounded border';
+                img.onload = function () {
+                    URL.revokeObjectURL(url);
+                };
+                list.appendChild(img);
+            });
+
+            container.classList.remove('d-none');
+        });
+    })();
+</script>
+@endpush
