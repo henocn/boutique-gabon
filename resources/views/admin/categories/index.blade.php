@@ -1,10 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <h1 class="h4 fw-bold mb-1">Categories</h1>
-            <p class="text-muted mb-0">Gestion des categories produits.</p>
+            <h1 class="h4 fw-bold mb-0">Categories</h1>
         </div>
-        <a class="btn btn-brand" href="{{ route('admin.categories.create') }}">Nouvelle categorie</a>
+        <button class="btn btn-brand" type="button" data-bs-toggle="modal" data-bs-target="#categoryCreateModal" aria-label="Ajouter">
+            <i class="bi bi-plus-lg"></i>
+        </button>
     </x-slot>
 
     @if (session('status'))
@@ -39,11 +40,15 @@
                                 @endif
                             </td>
                             <td class="text-end">
-                                <a class="btn btn-sm btn-outline-secondary" href="{{ route('admin.categories.edit', $category) }}">Modifier</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="{{ route('admin.categories.edit', $category) }}" aria-label="Modifier" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
                                 <form class="d-inline" method="POST" action="{{ route('admin.categories.destroy', $category) }}" onsubmit="return confirm('Supprimer cette categorie ?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+                                    <button class="btn btn-sm btn-outline-danger" type="submit" aria-label="Supprimer" title="Supprimer">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </form>
                             </td>
                         </tr>
@@ -59,5 +64,22 @@
 
     <div class="mt-3">
         {{ $categories->links() }}
+    </div>
+
+    <div class="modal fade" id="categoryCreateModal" tabindex="-1" aria-labelledby="categoryCreateLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="categoryCreateLabel">Nouvelle categorie</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{{ route('admin.categories.store') }}" enctype="multipart/form-data">
+                        @csrf
+                        @include('admin.categories.partials.form', ['submitLabel' => 'Creer', 'compactActions' => true])
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </x-app-layout>

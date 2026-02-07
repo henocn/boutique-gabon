@@ -29,6 +29,14 @@
 </div>
 
 <div class="d-flex gap-2">
-    <button class="btn btn-brand" type="submit">{{ $submitLabel }}</button>
-    <a class="btn btn-outline-secondary" href="{{ route('admin.categories.index') }}">Annuler</a>
+    <button class="btn btn-brand" type="submit" aria-label="{{ $submitLabel }}">
+        <i class="bi bi-check-lg"></i>
+        <span class="visually-hidden">{{ $submitLabel }}</span>
+    </button>
+    @if (! ($compactActions ?? false))
+        <a class="btn btn-outline-secondary" href="{{ route('admin.categories.index') }}" aria-label="Annuler">
+            <i class="bi bi-x-lg"></i>
+            <span class="visually-hidden">Annuler</span>
+        </a>
+    @endif
 </div>
