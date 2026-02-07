@@ -32,12 +32,6 @@
                     <p class="h4 fw-bold mb-0">{{ $activeProducts }}</p>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="card card-soft p-3">
-                    <p class="text-muted mb-1">Categories actives</p>
-                    <p class="h4 fw-bold mb-0">{{ $activeCategories }}</p>
-                </div>
-            </div>
         @endif
     </div>
 
