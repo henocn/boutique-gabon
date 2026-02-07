@@ -1,10 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <h1 class="h4 fw-bold mb-1">Utilisateurs</h1>
-            <p class="text-muted mb-0">Admins et managers.</p>
+            <h1 class="h4 fw-bold mb-0">Utilisateurs</h1>
         </div>
-        <a class="btn btn-brand" href="{{ route('admin.users.create') }}">Nouvel utilisateur</a>
+        <a class="btn btn-brand" href="{{ route('admin.users.create') }}" aria-label="Ajouter">
+            <i class="bi bi-plus-lg"></i>
+        </a>
     </x-slot>
 
     @if (session('status'))
@@ -49,11 +50,15 @@
                                 </span>
                             </td>
                             <td class="text-end">
-                                <a class="btn btn-sm btn-outline-secondary" href="{{ route('admin.users.edit', $user) }}">Modifier</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="{{ route('admin.users.edit', $user) }}" aria-label="Modifier" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
                                 <form class="d-inline" method="POST" action="{{ route('admin.users.destroy', $user) }}" onsubmit="return confirm('Supprimer cet utilisateur ?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+                                    <button class="btn btn-sm btn-outline-danger" type="submit" aria-label="Supprimer" title="Supprimer">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </form>
                             </td>
                         </tr>

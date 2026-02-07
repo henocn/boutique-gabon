@@ -1,10 +1,11 @@
 <x-app-layout>
     <x-slot name="header">
         <div>
-            <h1 class="h4 fw-bold mb-1">Produits</h1>
-            <p class="text-muted mb-0">Gestion des produits et assignations.</p>
+            <h1 class="h4 fw-bold mb-0">Produits</h1>
         </div>
-        <a class="btn btn-brand" href="{{ route('admin.products.create') }}">Nouveau produit</a>
+        <a class="btn btn-brand" href="{{ route('admin.products.create') }}" aria-label="Ajouter">
+            <i class="bi bi-plus-lg"></i>
+        </a>
     </x-slot>
 
     @if (session('status'))
@@ -38,11 +39,15 @@
                                 <span class="badge text-bg-secondary">{{ ucfirst(str_replace('_', ' ', $product->status->value)) }}</span>
                             </td>
                             <td class="text-end">
-                                <a class="btn btn-sm btn-outline-secondary" href="{{ route('admin.products.edit', $product) }}">Modifier</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="{{ route('admin.products.edit', $product) }}" aria-label="Modifier" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
                                 <form class="d-inline" method="POST" action="{{ route('admin.products.destroy', $product) }}" onsubmit="return confirm('Supprimer ce produit ?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+                                    <button class="btn btn-sm btn-outline-danger" type="submit" aria-label="Supprimer" title="Supprimer">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
                                 </form>
                             </td>
                         </tr>
