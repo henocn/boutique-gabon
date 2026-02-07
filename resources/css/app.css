@@ -61,6 +61,36 @@ body {
 	min-width: 240px;
 }
 
+.filter-row .form-select {
+	min-width: 220px;
+}
+
+.product-card {
+	border: 1px solid var(--brand-500);
+	border-radius: 0;
+	box-shadow: var(--shadow-soft);
+	overflow: hidden;
+}
+
+.product-body {
+	padding: 0.85rem 1rem 1rem;
+}
+
+.product-desc {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.product-actions {
+	position: relative;
+	z-index: 2;
+}
+
+.product-hero-image {
+	max-height: 320px;
+}
+
 @media (max-width: 991.98px) {
 	body {
 		padding-top: 72px;
@@ -72,5 +102,9 @@ body {
 
 	.navbar-search {
 		min-width: 100%;
+	}
+
+	.product-hero-image {
+		max-height: 220px;
 	}
 }
