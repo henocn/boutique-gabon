@@ -79,6 +79,22 @@ body {
 	min-width: 240px;
 }
 
+.navbar-search-form {
+	max-width: 0;
+	overflow: hidden;
+	opacity: 0;
+	transition: max-width 0.2s ease, opacity 0.2s ease;
+}
+
+.navbar-search-form.is-open {
+	max-width: 360px;
+	opacity: 1;
+}
+
+.navbar-search-toggle {
+	margin-left: 0.5rem;
+}
+
 .filter-row .form-select {
 	min-width: 220px;
 }

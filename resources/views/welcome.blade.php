@@ -22,7 +22,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="mainNav">
-                    <form class="d-flex align-items-center gap-2 ms-lg-4 me-lg-auto mt-3 mt-lg-0" method="GET" action="/">
+                    <form class="d-flex align-items-center gap-2 ms-lg-4 me-lg-auto mt-3 mt-lg-0 navbar-search-form" method="GET" action="/">
                         <input class="form-control form-control-sm navbar-search" type="search" name="q" value="{{ $search }}" placeholder="Rechercher un produit">
                         @if ($selectedCategory)
                             <input type="hidden" name="category" value="{{ $selectedCategory }}">
@@ -31,6 +31,9 @@
                             <i class="bi bi-search"></i>
                         </button>
                     </form>
+                    <button class="btn btn-sm btn-brand navbar-search-toggle" type="button" aria-label="Ouvrir la recherche">
+                        <i class="bi bi-search"></i>
+                    </button>
                     <ul class="navbar-nav align-items-lg-center gap-lg-3">
                         <li class="nav-item"><a class="nav-link" href="#products">Produits</a></li>
                         <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
@@ -56,7 +59,7 @@
                         <h2 class="h3 fw-bold mb-1">Produits</h2>
                         <p class="text-muted mb-0">Trouvez rapidement ce qui vous plait.</p>
                     </div>
-                    <form class="d-flex align-items-center gap-2 flex-wrap flex-lg-nowrap filter-row" method="GET" action="/">
+                    <form class="d-flex align-items-center gap-2 flex-nowrap filter-row" method="GET" action="/">
                         @if ($search)
                             <input type="hidden" name="q" value="{{ $search }}">
                         @endif
@@ -175,6 +178,17 @@
         </footer>
         <script>
             (function () {
+                var searchToggle = document.querySelector('.navbar-search-toggle');
+                var searchForm = document.querySelector('.navbar-search-form');
+                if (searchToggle && searchForm) {
+                    searchToggle.addEventListener('click', function () {
+                        searchForm.classList.toggle('is-open');
+                        var input = searchForm.querySelector('input[type="search"]');
+                        if (input) {
+                            input.focus();
+                        }
+                    });
+                }
                 var modal = document.getElementById('orderModal');
                 if (!modal) {
                     return;
