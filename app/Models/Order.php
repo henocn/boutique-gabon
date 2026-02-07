@@ -21,14 +21,7 @@ class Order extends Model
             }
 
             if (Schema::hasColumn('orders', 'statut') && $order->statut === null && $order->status) {
-                $order->statut = match ($order->status) {
-                    OrderStatus::Delivered => 'livre',
-                    OrderStatus::Validated => 'valide',
-                    OrderStatus::Cancelled => 'annule',
-                    OrderStatus::Processed => 'traite',
-                    OrderStatus::Unreachable => 'injoignable',
-                    default => 'nouveau',
-                };
+                $order->statut = $order->status->value;
             }
 
             if (Schema::hasColumn('orders', 'produits') && empty($order->produits)) {
