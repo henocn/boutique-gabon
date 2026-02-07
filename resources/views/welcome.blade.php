@@ -20,9 +20,9 @@
                 </button>
                 <div class="collapse navbar-collapse" id="mainNav">
                     <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
-                        <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
                         <li class="nav-item"><a class="nav-link" href="#products">Produits</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#cart">Panier</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ route('cart.index') }}">Panier</a></li>
                         <li class="nav-item">
                             <a class="btn btn-brand" href="{{ route('login') }}">Espace Admin</a>
                         </li>
@@ -71,11 +71,67 @@
             </div>
         </header>
 
+        <section id="products" class="py-5 bg-white">
+            <div class="container">
+                <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
+                    <div>
+                        <h2 class="h3 fw-bold mb-1">Produits</h2>
+                        <p class="text-muted mb-0">Trouvez rapidement ce qui vous plait.</p>
+                    </div>
+                    <form class="d-flex flex-wrap gap-2" method="GET" action="/">
+                        <input class="form-control" type="search" name="q" value="{{ $search }}" placeholder="Rechercher un produit">
+                        <select class="form-select" name="category">
+                            <option value="">Toutes categories</option>
+                            @foreach ($categories as $category)
+                                <option value="{{ $category->id }}" @selected((string) $selectedCategory === (string) $category->id)>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <button class="btn btn-outline-secondary" type="submit">Filtrer</button>
+                    </form>
+                </div>
+                @if (session('status'))
+                    <div class="alert alert-success">{{ session('status') }}</div>
+                @endif
+                <div class="row g-3">
+                    @forelse ($products as $product)
+                        @php
+                            $firstImage = $product->productImages->first();
+                        @endphp
+                        <div class="col-6 col-lg-4">
+                            <div class="card card-soft p-3 h-100">
+                                <div class="ratio ratio-4x3 bg-light rounded-4 overflow-hidden">
+                                    @if ($firstImage)
+                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($firstImage->path) }}" alt="{{ $product->name }}" class="w-100 h-100 object-fit-cover">
+                                    @endif
+                                </div>
+                                <div class="mt-3">
+                                    <p class="fw-semibold mb-1">{{ $product->name }}</p>
+                                    <p class="text-muted small mb-2">{{ $product->category?->name }}</p>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span class="fw-bold">{{ number_format($product->price_sell, 0, ',', ' ') }} FCFA</span>
+                                        <button class="btn btn-sm btn-brand" type="button" data-bs-toggle="modal" data-bs-target="#orderModal" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}">
+                                            Commander
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="col-12">
+                            <div class="alert alert-light">Aucun produit pour le moment.</div>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </section>
+
         <section id="categories" class="py-5">
             <div class="container">
                 <div class="d-flex align-items-end justify-content-between mb-3">
                     <h2 class="h3 fw-bold mb-0">Categories</h2>
-                    <a class="text-brand fw-semibold" href="#products">Voir tout</a>
+                    <a class="text-brand fw-semibold" href="#products">Voir les produits</a>
                 </div>
                 <div class="row g-3">
                     @forelse ($categories as $category)
@@ -101,76 +157,31 @@
             </div>
         </section>
 
-        <section id="products" class="py-5 bg-white">
-            <div class="container">
-                <div class="d-flex align-items-end justify-content-between mb-3">
-                    <h2 class="h3 fw-bold mb-0">Produits</h2>
-                    <form class="d-flex gap-2">
-                        <input class="form-control" type="search" placeholder="Rechercher">
-                        <button class="btn btn-outline-secondary" type="button">Filtrer</button>
+        <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('cart.add') }}">
+                        @csrf
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="orderModalLabel">Ajouter au panier</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" name="product_id" id="orderProductId">
+                            <p class="fw-semibold mb-3" id="orderProductName"></p>
+                            <div class="mb-3">
+                                <label class="form-label" for="orderQuantity">Quantite</label>
+                                <input id="orderQuantity" name="quantity" type="number" min="1" max="99" value="1" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-brand">Ajouter</button>
+                        </div>
                     </form>
                 </div>
-                <div class="row g-3">
-                    @forelse ($products as $product)
-                        @php
-                            $firstImage = $product->productImages->first();
-                        @endphp
-                        <div class="col-6 col-lg-4">
-                            <div class="card card-soft p-3 h-100">
-                                <div class="ratio ratio-4x3 bg-light rounded-4 overflow-hidden">
-                                    @if ($firstImage)
-                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($firstImage->path) }}" alt="{{ $product->name }}" class="w-100 h-100 object-fit-cover">
-                                    @endif
-                                </div>
-                                <div class="mt-3">
-                                    <p class="fw-semibold mb-1">{{ $product->name }}</p>
-                                    <p class="text-muted small mb-2">{{ $product->category?->name }}</p>
-                                    <div class="d-flex align-items-center justify-content-between">
-                                        <span class="fw-bold">{{ number_format($product->price_sell, 0, ',', ' ') }} FCFA</span>
-                                        <button class="btn btn-sm btn-brand" type="button">Ajouter</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="col-12">
-                            <div class="alert alert-light">Aucun produit pour le moment.</div>
-                        </div>
-                    @endforelse
-                </div>
             </div>
-        </section>
-
-        <section id="cart" class="py-5">
-            <div class="container">
-                <div class="row g-4">
-                    <div class="col-lg-7">
-                        <h2 class="h3 fw-bold mb-3">Panier</h2>
-                        <div class="card card-soft p-4">
-                            <p class="text-muted mb-0">Votre panier est vide pour l'instant.</p>
-                        </div>
-                    </div>
-                    <div class="col-lg-5">
-                        <h2 class="h3 fw-bold mb-3">Validation</h2>
-                        <div class="card card-soft p-4">
-                            <div class="mb-3">
-                                <label class="form-label">Nom</label>
-                                <input class="form-control" type="text" placeholder="Votre nom">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Contact</label>
-                                <input class="form-control" type="text" placeholder="+241">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">Commentaire (optionnel)</label>
-                                <textarea class="form-control" rows="3" placeholder="Infos livraison"></textarea>
-                            </div>
-                            <button class="btn btn-brand w-100" type="button">Valider la commande</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
+        </div>
 
         <footer class="py-4 border-top bg-white">
             <div class="container d-flex flex-wrap justify-content-between align-items-center">
@@ -178,5 +189,21 @@
                 <span class="text-muted">Support: +241 00 00 00 00</span>
             </div>
         </footer>
+        <script>
+            (function () {
+                var modal = document.getElementById('orderModal');
+                if (!modal) {
+                    return;
+                }
+                modal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    var productId = button.getAttribute('data-product-id');
+                    var productName = button.getAttribute('data-product-name');
+                    document.getElementById('orderProductId').value = productId;
+                    document.getElementById('orderProductName').textContent = productName;
+                    document.getElementById('orderQuantity').value = 1;
+                });
+            })();
+        </script>
     </body>
 </html>
