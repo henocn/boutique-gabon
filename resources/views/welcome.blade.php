@@ -12,64 +12,40 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg bg-white border-bottom">
+        @php
+            $cartCount = array_sum(session('cart', []));
+        @endphp
+        <nav class="navbar navbar-expand-lg bg-white border-bottom navbar-client fixed-top">
             <div class="container">
                 <a class="navbar-brand fw-bold" href="/">Boutique Gabon</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="mainNav">
-                    <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+                    <form class="d-flex align-items-center gap-2 ms-lg-4 me-lg-auto mt-3 mt-lg-0" method="GET" action="/">
+                        <input class="form-control form-control-sm navbar-search" type="search" name="q" value="{{ $search }}" placeholder="Rechercher un produit">
+                        @if ($selectedCategory)
+                            <input type="hidden" name="category" value="{{ $selectedCategory }}">
+                        @endif
+                        <button class="btn btn-sm btn-outline-secondary" type="submit">OK</button>
+                    </form>
+                    <ul class="navbar-nav align-items-lg-center gap-lg-3">
                         <li class="nav-item"><a class="nav-link" href="#products">Produits</a></li>
                         <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
-                        <li class="nav-item"><a class="nav-link" href="{{ route('cart.index') }}">Panier</a></li>
                         <li class="nav-item">
-                            <a class="btn btn-brand" href="{{ route('login') }}">Espace Admin</a>
+                            <a class="btn btn-outline-secondary position-relative" href="{{ route('cart.index') }}">
+                                Mon panier
+                                @if ($cartCount > 0)
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-brand">
+                                        {{ $cartCount }}
+                                    </span>
+                                @endif
+                            </a>
                         </li>
                     </ul>
                 </div>
             </div>
         </nav>
-
-        <header class="py-5">
-            <div class="container">
-                <div class="row align-items-center g-4">
-                    <div class="col-lg-6">
-                        <p class="badge badge-soft text-uppercase mb-3">E-commerce local</p>
-                        <h1 class="display-5 fw-bold mb-3">Vente rapide, gestion simple, experience propre.</h1>
-                        <p class="text-muted mb-4">Catalogue clair, panier en session et commandes gerees par role. Tout ce qu'il faut pour vendre vite.</p>
-                        <div class="d-flex flex-wrap gap-2">
-                            <a class="btn btn-brand btn-lg" href="#products">Voir les produits</a>
-                            <a class="btn btn-outline-secondary btn-lg" href="#categories">Explorer les categories</a>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="card card-soft p-4">
-                            <div class="row g-3">
-                                <div class="col-6">
-                                    <div class="bg-white border rounded-4 p-3">
-                                        <p class="text-muted mb-1">Panier</p>
-                                        <p class="fw-semibold mb-0">Session rapide</p>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="bg-white border rounded-4 p-3">
-                                        <p class="text-muted mb-1">Commandes</p>
-                                        <p class="fw-semibold mb-0">Suivi clair</p>
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <div class="bg-white border rounded-4 p-3">
-                                        <p class="text-muted mb-1">Roles</p>
-                                        <p class="fw-semibold mb-0">Admin & Manager securises</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
 
         <section id="products" class="py-5 bg-white">
             <div class="container">
@@ -79,7 +55,9 @@
                         <p class="text-muted mb-0">Trouvez rapidement ce qui vous plait.</p>
                     </div>
                     <form class="d-flex flex-wrap gap-2" method="GET" action="/">
-                        <input class="form-control" type="search" name="q" value="{{ $search }}" placeholder="Rechercher un produit">
+                        @if ($search)
+                            <input type="hidden" name="q" value="{{ $search }}">
+                        @endif
                         <select class="form-select" name="category">
                             <option value="">Toutes categories</option>
                             @foreach ($categories as $category)

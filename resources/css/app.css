@@ -20,6 +20,7 @@ body {
 	font-family: var(--font-sans);
 	color: var(--ink-900);
 	background-color: var(--bg-100);
+	padding-top: 88px;
 }
 
 .bg-brand {
@@ -49,4 +50,27 @@ body {
 	background: #fff1df;
 	color: var(--brand-700);
 	border: 1px solid #f3d7b2;
+}
+
+.navbar-client {
+	min-height: 80px;
+	backdrop-filter: blur(12px);
+}
+
+.navbar-search {
+	min-width: 240px;
+}
+
+@media (max-width: 991.98px) {
+	body {
+		padding-top: 72px;
+	}
+
+	.navbar-client {
+		min-height: 64px;
+	}
+
+	.navbar-search {
+		min-width: 100%;
+	}
 }
