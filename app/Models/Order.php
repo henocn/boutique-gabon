@@ -30,6 +30,14 @@ class Order extends Model
                     default => 'nouveau',
                 };
             }
+
+            if (Schema::hasColumn('orders', 'produits') && empty($order->produits)) {
+                $order->produits = (string) ($order->product_id ?? '');
+            }
+
+            if (Schema::hasColumn('orders', 'managers') && empty($order->managers)) {
+                $order->managers = (string) ($order->product?->manager_id ?? '');
+            }
         });
     }
 
