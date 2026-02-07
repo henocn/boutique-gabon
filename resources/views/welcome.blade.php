@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ config('app.name', 'Boutique Gabon') }}</title>
+        <title>{{ config('app.shop_name', config('app.name')) }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700" rel="stylesheet" />
@@ -17,7 +17,7 @@
         @endphp
         <nav class="navbar navbar-expand-lg bg-white border-bottom navbar-client fixed-top">
             <div class="container">
-                <a class="navbar-brand fw-bold" href="/">Boutique Gabon</a>
+                <a class="navbar-brand fw-bold" href="/">{{ config('app.shop_name', config('app.name')) }}</a>
                 <button class="btn btn-sm btn-brand d-lg-none me-2" type="button" data-bs-toggle="modal" data-bs-target="#searchModal" aria-label="Rechercher">
                     <i class="bi bi-search"></i>
                 </button>
@@ -198,7 +198,7 @@
 
         <footer class="py-4 border-top bg-white">
             <div class="container d-flex flex-wrap justify-content-between align-items-center">
-                <p class="mb-0 text-muted">{{ date('Y') }} Boutique Gabon. Tous droits reserves.</p>
+                <p class="mb-0 text-muted">{{ date('Y') }} {{ config('app.shop_name', config('app.name')) }}. Tous droits reserves.</p>
                 <span class="text-muted">Support: +241 00 00 00 00</span>
             </div>
         </footer>

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Panier - {{ config('app.name', 'Boutique Gabon') }}</title>
+        <title>Panier - {{ config('app.shop_name', config('app.name')) }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700" rel="stylesheet" />
@@ -14,7 +14,7 @@
     <body>
         <nav class="navbar navbar-expand-lg bg-white border-bottom navbar-client fixed-top">
             <div class="container">
-                <a class="navbar-brand fw-bold" href="/">Boutique Gabon</a>
+                <a class="navbar-brand fw-bold" href="/">{{ config('app.shop_name', config('app.name')) }}</a>
                 <div class="d-flex gap-2">
                     <a class="btn btn-brand" href="/">Continuer les achats</a>
                 </div>
