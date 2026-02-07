@@ -16,7 +16,7 @@
             <div class="container">
                 <a class="navbar-brand fw-bold" href="/">Boutique Gabon</a>
                 <div class="d-flex gap-2">
-                    <a class="btn btn-outline-secondary" href="/">Continuer les achats</a>
+                    <a class="btn btn-brand" href="/">Continuer les achats</a>
                 </div>
             </div>
         </nav>
