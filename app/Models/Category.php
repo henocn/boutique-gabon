@@ -7,6 +7,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
+    protected static function booted(): void
+    {
+        static::saving(function (Category $category): void {
+            if (empty($category->nom)) {
+                $category->nom = $category->name;
+            }
+
+            if (empty($category->image) && ! empty($category->image_path)) {
+                $category->image = $category->image_path;
+            }
+
+            if ($category->statut === null) {
+                $category->statut = $category->is_active ? 'actif' : 'inactif';
+            }
+        });
+    }
     protected $fillable = [
         'name',
         'description',

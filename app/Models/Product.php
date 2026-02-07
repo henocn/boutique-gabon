@@ -9,6 +9,30 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Product extends Model
 {
+    protected static function booted(): void
+    {
+        static::saving(function (Product $product): void {
+            if (empty($product->nom)) {
+                $product->nom = $product->name;
+            }
+
+            if (empty($product->description) && ! empty($product->description_html)) {
+                $product->description = $product->description_html;
+            }
+
+            if (empty($product->prix) && ! empty($product->price_sell)) {
+                $product->prix = $product->price_sell;
+            }
+
+            if (empty($product->categorie_id) && ! empty($product->category_id)) {
+                $product->categorie_id = $product->category_id;
+            }
+
+            if ($product->statut === null) {
+                $product->statut = $product->status === ProductStatus::Active ? 'actif' : 'inactif';
+            }
+        });
+    }
     protected $fillable = [
         'name',
         'description_html',
