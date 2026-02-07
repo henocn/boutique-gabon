@@ -131,6 +131,8 @@ body {
 	width: 84px;
 	height: 84px;
 	flex: 0 0 auto;
+	background: transparent;
+	padding: 0;
 }
 
 .product-detail-summary {
