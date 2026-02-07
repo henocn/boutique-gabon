@@ -10,11 +10,13 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Carbon\Carbon;
 
 class CartController extends Controller
 {
     public function index(): View
     {
+        $expired = $this->clearIfExpired();
         $cart = session()->get('cart', []);
         $productIds = array_keys($cart);
 
@@ -42,11 +44,12 @@ class CartController extends Controller
             ];
         }
 
-        return view('cart', compact('items', 'total'));
+        return view('cart', compact('items', 'total', 'expired'));
     }
 
     public function add(Request $request): RedirectResponse
     {
+        $this->clearIfExpired();
         $data = $request->validate([
             'product_id' => ['required', 'integer', 'exists:products,id'],
             'quantity' => ['required', 'integer', 'min:1', 'max:99'],
@@ -56,12 +59,16 @@ class CartController extends Controller
         $productId = (string) $data['product_id'];
         $cart[$productId] = ($cart[$productId] ?? 0) + $data['quantity'];
         session()->put('cart', $cart);
+        session()->put('cart_created_at', session('cart_created_at') ?? Carbon::now()->timestamp);
 
         return back()->with('status', 'Produit ajoute au panier.');
     }
 
     public function update(Request $request, Product $product): RedirectResponse
     {
+        if ($this->clearIfExpired()) {
+            return back()->withErrors(['cart' => 'Panier reinitialise apres 30 minutes.']);
+        }
         $data = $request->validate([
             'quantity' => ['required', 'integer', 'min:0', 'max:99'],
         ]);
@@ -76,12 +83,16 @@ class CartController extends Controller
         }
 
         session()->put('cart', $cart);
+        session()->put('cart_created_at', session('cart_created_at') ?? Carbon::now()->timestamp);
 
         return back()->with('status', 'Panier mis a jour.');
     }
 
     public function remove(Product $product): RedirectResponse
     {
+        if ($this->clearIfExpired()) {
+            return back()->withErrors(['cart' => 'Panier reinitialise apres 30 minutes.']);
+        }
         $cart = session()->get('cart', []);
         unset($cart[(string) $product->id]);
         session()->put('cart', $cart);
@@ -91,6 +102,9 @@ class CartController extends Controller
 
     public function checkout(Request $request): RedirectResponse
     {
+        if ($this->clearIfExpired()) {
+            return back()->withErrors(['cart' => 'Panier reinitialise apres 30 minutes.']);
+        }
         $data = $request->validate([
             'client_name' => ['required', 'string', 'max:120'],
             'client_contact' => ['required', 'string', 'max:120'],
@@ -116,7 +130,25 @@ class CartController extends Controller
         });
 
         session()->forget('cart');
+        session()->forget('cart_created_at');
 
         return redirect('/')->with('status', 'Commande envoyee.');
+    }
+
+    private function clearIfExpired(): bool
+    {
+        $createdAt = session()->get('cart_created_at');
+        if (! $createdAt) {
+            return false;
+        }
+
+        $expiresAt = Carbon::createFromTimestamp((int) $createdAt)->addMinutes(30);
+        if (Carbon::now()->greaterThan($expiresAt)) {
+            session()->forget('cart');
+            session()->forget('cart_created_at');
+            return true;
+        }
+
+        return false;
     }
 }

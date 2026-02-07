@@ -12,7 +12,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body>
-        <nav class="navbar navbar-expand-lg bg-white border-bottom">
+        <nav class="navbar navbar-expand-lg bg-white border-bottom navbar-client fixed-top">
             <div class="container">
                 <a class="navbar-brand fw-bold" href="/">Boutique Gabon</a>
                 <div class="d-flex gap-2">
@@ -27,9 +27,13 @@
                     <div>
                         <h1 class="h4 fw-bold mb-1">Votre panier</h1>
                         <p class="text-muted mb-0">Verifiez les produits avant de valider.</p>
+                        <p class="text-muted small mb-0">Le panier se reinitialise apres 30 minutes sans validation.</p>
                     </div>
                 </div>
 
+                @if (! empty($expired))
+                    <div class="alert alert-warning">Panier reinitialise apres 30 minutes.</div>
+                @endif
                 @if (session('status'))
                     <div class="alert alert-success">{{ session('status') }}</div>
                 @endif
@@ -63,7 +67,9 @@
                                         @csrf
                                         @method('PATCH')
                                         <input class="form-control form-control-sm" type="number" name="quantity" min="0" max="99" value="{{ $item['quantity'] }}" style="width: 80px;">
-                                        <button class="btn btn-sm btn-outline-secondary" type="submit">Maj</button>
+                                        <button class="btn btn-sm btn-outline-secondary" type="submit" aria-label="Mettre a jour" title="Mettre a jour">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </button>
                                     </form>
                                     <form method="POST" action="{{ route('cart.remove', $item['product']) }}">
                                         @csrf
