@@ -27,13 +27,15 @@
                         @if ($selectedCategory)
                             <input type="hidden" name="category" value="{{ $selectedCategory }}">
                         @endif
-                        <button class="btn btn-sm btn-outline-secondary" type="submit">OK</button>
+                        <button class="btn btn-sm btn-brand" type="submit" aria-label="Rechercher">
+                            <i class="bi bi-search"></i>
+                        </button>
                     </form>
                     <ul class="navbar-nav align-items-lg-center gap-lg-3">
                         <li class="nav-item"><a class="nav-link" href="#products">Produits</a></li>
                         <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
                         <li class="nav-item">
-                            <a class="btn btn-outline-secondary position-relative" href="{{ route('cart.index') }}">
+                            <a class="btn btn-brand position-relative" href="{{ route('cart.index') }}">
                                 Mon panier
                                 @if ($cartCount > 0)
                                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-brand">
@@ -54,7 +56,7 @@
                         <h2 class="h3 fw-bold mb-1">Produits</h2>
                         <p class="text-muted mb-0">Trouvez rapidement ce qui vous plait.</p>
                     </div>
-                    <form class="d-flex flex-wrap gap-2" method="GET" action="/">
+                    <form class="d-flex align-items-center gap-2 flex-wrap flex-lg-nowrap filter-row" method="GET" action="/">
                         @if ($search)
                             <input type="hidden" name="q" value="{{ $search }}">
                         @endif
@@ -66,7 +68,7 @@
                                 </option>
                             @endforeach
                         </select>
-                        <button class="btn btn-outline-secondary" type="submit">Filtrer</button>
+                        <button class="btn btn-brand" type="submit">Filtrer</button>
                     </form>
                 </div>
                 @if (session('status'))
@@ -78,19 +80,20 @@
                             $firstImage = $product->productImages->first();
                         @endphp
                         <div class="col-6 col-lg-4">
-                            <div class="card card-soft p-3 h-100">
-                                <div class="ratio ratio-4x3 bg-light rounded-4 overflow-hidden">
+                            <div class="card product-card h-100">
+                                <div class="ratio ratio-4x3 bg-light overflow-hidden">
                                     @if ($firstImage)
                                         <img src="{{ \Illuminate\Support\Facades\Storage::url($firstImage->path) }}" alt="{{ $product->name }}" class="w-100 h-100 object-fit-cover">
                                     @endif
                                 </div>
-                                <div class="mt-3">
+                                <div class="product-body">
+                                    <a class="stretched-link text-decoration-none text-reset" href="{{ route('products.show', $product) }}"></a>
                                     <p class="fw-semibold mb-1">{{ $product->name }}</p>
-                                    <p class="text-muted small mb-2">{{ $product->category?->name }}</p>
-                                    <div class="d-flex align-items-center justify-content-between">
+                                    <p class="text-muted small product-desc mb-2">{{ strip_tags($product->description_html ?? '') }}</p>
+                                    <div class="d-flex align-items-center justify-content-between product-actions">
                                         <span class="fw-bold">{{ number_format($product->price_sell, 0, ',', ' ') }} FCFA</span>
-                                        <button class="btn btn-sm btn-brand" type="button" data-bs-toggle="modal" data-bs-target="#orderModal" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}">
-                                            Commander
+                                        <button class="btn btn-brand btn-cart" type="button" data-bs-toggle="modal" data-bs-target="#orderModal" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" aria-label="Ajouter au panier">
+                                            <i class="bi bi-cart"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -113,8 +116,11 @@
                 </div>
                 <div class="row g-3">
                     @forelse ($categories as $category)
+                        @php
+                            $categoryUrl = url('/').'?category='.$category->id.($search ? '&q='.urlencode($search) : '');
+                        @endphp
                         <div class="col-6 col-lg-3">
-                            <div class="card card-soft p-3">
+                            <a class="card card-soft p-3 text-decoration-none text-reset" href="{{ $categoryUrl }}">
                                 <div class="ratio ratio-4x3 bg-light rounded-4 overflow-hidden">
                                     @if ($category->image_path)
                                         <img src="{{ \Illuminate\Support\Facades\Storage::url($category->image_path) }}" alt="{{ $category->name }}" class="w-100 h-100 object-fit-cover">
@@ -124,7 +130,7 @@
                                     <p class="fw-semibold mb-1">{{ $category->name }}</p>
                                     <p class="text-muted small mb-0">{{ \Illuminate\Support\Str::limit($category->description, 60) }}</p>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     @empty
                         <div class="col-12">

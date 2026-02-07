@@ -32,31 +32,60 @@
 
         <main class="py-5">
             <div class="container">
-                <div class="row g-4">
-                    <div class="col-lg-6">
-                        <div class="ratio ratio-4x3 bg-light border product-hero-image">
-                            @php($firstImage = $product->productImages->first())
-                            @if ($firstImage)
-                                <img src="{{ \Illuminate\Support\Facades\Storage::url($firstImage->path) }}" alt="{{ $product->name }}" class="w-100 h-100 object-fit-cover">
+                @php($images = $product->productImages)
+                <div class="product-detail card-soft p-4">
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <div class="ratio ratio-4x3 bg-light border product-hero-image rounded-3 overflow-hidden">
+                                @php($firstImage = $images->first())
+                                @if ($firstImage)
+                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($firstImage->path) }}" alt="{{ $product->name }}" class="w-100 h-100 object-fit-cover">
+                                @else
+                                    <div class="d-flex align-items-center justify-content-center text-muted">Aucune image</div>
+                                @endif
+                            </div>
+                            @if ($images->count() > 1)
+                                <div class="d-flex gap-2 mt-3 flex-wrap">
+                                    @foreach ($images->slice(1) as $image)
+                                        <div class="product-thumb border rounded-3 overflow-hidden">
+                                            <img src="{{ \Illuminate\Support\Facades\Storage::url($image->path) }}" alt="{{ $product->name }}" class="w-100 h-100 object-fit-cover">
+                                        </div>
+                                    @endforeach
+                                </div>
                             @endif
                         </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <p class="text-muted mb-1">{{ $product->category?->name }}</p>
-                        <h1 class="h3 fw-bold mb-3">{{ $product->name }}</h1>
-                        <div class="text-muted mb-3 product-detail-desc">{!! $product->description_html !!}</div>
-                        <div class="d-flex align-items-center justify-content-between mb-4">
-                            <span class="h4 fw-bold mb-0">{{ number_format($product->price_sell, 0, ',', ' ') }} FCFA</span>
+                        <div class="col-lg-6">
+                            <div class="text-muted small mb-2">{{ $product->category?->name }}</div>
+                            <h1 class="h3 fw-bold mb-2">{{ $product->name }}</h1>
+                            <div class="text-muted product-detail-summary mb-3">{{ strip_tags($product->description_html ?? '') }}</div>
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <span class="h4 fw-bold mb-0">{{ number_format($product->price_sell, 0, ',', ' ') }} FCFA</span>
+                                <span class="badge badge-soft">Stock {{ $product->stock }}</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-3 mb-4 flex-wrap">
+                                <div class="d-flex align-items-center gap-2 text-muted">
+                                    <i class="bi bi-truck"></i>
+                                    Livraison rapide
+                                </div>
+                                <div class="d-flex align-items-center gap-2 text-muted">
+                                    <i class="bi bi-shield-check"></i>
+                                    Paiement a la livraison
+                                </div>
+                            </div>
+                            <form class="d-flex align-items-center gap-2" method="POST" action="{{ route('cart.add') }}">
+                                @csrf
+                                <input type="hidden" name="product_id" value="{{ $product->id }}">
+                                <input class="form-control" type="number" name="quantity" min="1" max="99" value="1" style="width: 120px;" required>
+                                <button class="btn btn-brand" type="submit">
+                                    <i class="bi bi-cart"></i>
+                                    Ajouter au panier
+                                </button>
+                            </form>
                         </div>
-                        <form class="d-flex align-items-center gap-2" method="POST" action="{{ route('cart.add') }}">
-                            @csrf
-                            <input type="hidden" name="product_id" value="{{ $product->id }}">
-                            <input class="form-control" type="number" name="quantity" min="1" max="99" value="1" style="width: 120px;" required>
-                            <button class="btn btn-brand" type="submit">
-                                <i class="bi bi-cart"></i>
-                                Ajouter au panier
-                            </button>
-                        </form>
+                    </div>
+                    <div class="product-detail-section mt-4">
+                        <h2 class="h5 fw-bold mb-3">Description</h2>
+                        <div class="trix-content text-muted">{!! $product->description_html !!}</div>
                     </div>
                 </div>
             </div>
