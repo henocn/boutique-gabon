@@ -22,7 +22,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="mainNav">
-                    <form class="d-flex align-items-center gap-2 ms-lg-4 me-lg-auto mt-3 mt-lg-0 navbar-search-form" method="GET" action="/">
+                    <form class="d-none d-lg-flex align-items-center gap-2 ms-lg-4 me-lg-auto" method="GET" action="/">
                         <input class="form-control form-control-sm navbar-search" type="search" name="q" value="{{ $search }}" placeholder="Rechercher un produit">
                         @if ($selectedCategory)
                             <input type="hidden" name="category" value="{{ $selectedCategory }}">
@@ -31,9 +31,6 @@
                             <i class="bi bi-search"></i>
                         </button>
                     </form>
-                    <button class="btn btn-sm btn-brand navbar-search-toggle" type="button" aria-label="Ouvrir la recherche">
-                        <i class="bi bi-search"></i>
-                    </button>
                     <ul class="navbar-nav align-items-lg-center gap-lg-3">
                         <li class="nav-item"><a class="nav-link" href="#products">Produits</a></li>
                         <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
@@ -49,16 +46,16 @@
                         </li>
                     </ul>
                 </div>
+                <button class="btn btn-sm btn-brand d-lg-none" type="button" data-bs-toggle="modal" data-bs-target="#searchModal" aria-label="Rechercher">
+                    <i class="bi bi-search"></i>
+                </button>
             </div>
         </nav>
 
         <section id="products" class="py-5 bg-white">
             <div class="container">
                 <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
-                    <div>
-                        <h2 class="h3 fw-bold mb-1">Produits</h2>
-                        <p class="text-muted mb-0">Trouvez rapidement ce qui vous plait.</p>
-                    </div>
+                    <h2 class="h3 fw-bold mb-1">Produits</h2>
                     <form class="d-flex align-items-center gap-2 flex-nowrap filter-row" method="GET" action="/">
                         @if ($search)
                             <input type="hidden" name="q" value="{{ $search }}">
@@ -73,6 +70,9 @@
                         </select>
                         <button class="btn btn-brand" type="submit">Filtrer</button>
                     </form>
+                    <div>
+                        <p class="text-muted mb-0">Parcourez la liste de nos produits, trouvez rapidement ce qui vous plait et passez votre commande.</p>
+                    </div>
                 </div>
                 @if (session('status'))
                     <div class="alert alert-success">{{ session('status') }}</div>
@@ -82,7 +82,7 @@
                         @php
                             $firstImage = $product->productImages->first();
                         @endphp
-                        <div class="col-6 col-lg-4">
+                        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                             <div class="card product-card h-100">
                                 <div class="ratio ratio-4x3 bg-light overflow-hidden">
                                     @if ($firstImage)
@@ -170,6 +170,32 @@
             </div>
         </div>
 
+        <div class="modal fade" id="searchModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form method="GET" action="/">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Rechercher</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input class="form-control" type="search" name="q" value="{{ $search }}" placeholder="Rechercher un produit">
+                            @if ($selectedCategory)
+                                <input type="hidden" name="category" value="{{ $selectedCategory }}">
+                            @endif
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-brand">
+                                <i class="bi bi-search"></i>
+                                Rechercher
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <footer class="py-4 border-top bg-white">
             <div class="container d-flex flex-wrap justify-content-between align-items-center">
                 <p class="mb-0 text-muted">{{ date('Y') }} Boutique Gabon. Tous droits reserves.</p>
@@ -178,17 +204,6 @@
         </footer>
         <script>
             (function () {
-                var searchToggle = document.querySelector('.navbar-search-toggle');
-                var searchForm = document.querySelector('.navbar-search-form');
-                if (searchToggle && searchForm) {
-                    searchToggle.addEventListener('click', function () {
-                        searchForm.classList.toggle('is-open');
-                        var input = searchForm.querySelector('input[type="search"]');
-                        if (input) {
-                            input.focus();
-                        }
-                    });
-                }
                 var modal = document.getElementById('orderModal');
                 if (!modal) {
                     return;
