@@ -17,6 +17,7 @@ class CategoryUpdateRequest extends FormRequest
             'name' => ['required', 'string', 'max:120'],
             'description' => ['nullable', 'string'],
             'image' => ['nullable', 'image', 'max:2048'],
+            'remove_image' => ['nullable', 'boolean'],
             'is_active' => ['nullable', 'boolean'],
         ];
     }

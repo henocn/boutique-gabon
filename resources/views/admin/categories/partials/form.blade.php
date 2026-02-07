@@ -23,6 +23,19 @@
     <input id="image" name="image" type="file" class="form-control" accept="image/*">
 </div>
 
+@if ($category->exists && $category->image_path)
+    <div class="mb-3">
+        <label class="form-label">Image actuelle</label>
+        <div class="position-relative d-inline-block border rounded p-2">
+            <input class="btn-check" type="checkbox" name="remove_image" value="1" id="remove_image">
+            <label class="btn btn-sm btn-danger position-absolute top-0 start-0 m-1" for="remove_image" title="Supprimer">
+                <i class="bi bi-x"></i>
+            </label>
+            <img src="{{ \Illuminate\Support\Facades\Storage::url($category->image_path) }}" alt="Image" width="96" height="96" class="rounded">
+        </div>
+    </div>
+@endif
+
 <div class="form-check mb-3">
     <input id="is_active" name="is_active" type="checkbox" class="form-check-input" value="1" {{ old('is_active', $category->is_active) ? 'checked' : '' }}>
     <label class="form-check-label" for="is_active">Actif</label>

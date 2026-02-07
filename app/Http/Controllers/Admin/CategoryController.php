@@ -56,6 +56,12 @@ class CategoryController extends Controller
     {
         $data = $request->validated();
 
+        if (! empty($data['remove_image']) && $category->image_path) {
+            Storage::disk('public')->delete($category->image_path);
+            $category->image_path = null;
+            $category->save();
+        }
+
         if ($request->hasFile('image')) {
             if ($category->image_path) {
                 Storage::disk('public')->delete($category->image_path);

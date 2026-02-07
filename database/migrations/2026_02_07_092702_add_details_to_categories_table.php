@@ -12,10 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('categories', function (Blueprint $table) {
-            $table->string('name')->after('id');
-            $table->text('description')->nullable()->after('name');
-            $table->string('image_path')->nullable()->after('description');
-            $table->boolean('is_active')->default(true)->index()->after('image_path');
+            if (! Schema::hasColumn('categories', 'name')) {
+                $table->string('name')->after('id');
+            }
+            if (! Schema::hasColumn('categories', 'description')) {
+                $table->text('description')->nullable()->after('name');
+            }
+            if (! Schema::hasColumn('categories', 'image_path')) {
+                $table->string('image_path')->nullable()->after('description');
+            }
+            if (! Schema::hasColumn('categories', 'is_active')) {
+                $table->boolean('is_active')->default(true)->index()->after('image_path');
+            }
         });
     }
 
@@ -25,7 +33,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('categories', function (Blueprint $table) {
-            $table->dropColumn(['name', 'description', 'image_path', 'is_active']);
+            $columns = [];
+            foreach (['name', 'description', 'image_path', 'is_active'] as $column) {
+                if (Schema::hasColumn('categories', $column)) {
+                    $columns[] = $column;
+                }
+            }
+            if (! empty($columns)) {
+                $table->dropColumn($columns);
+            }
         });
     }
 };

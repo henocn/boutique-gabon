@@ -46,9 +46,9 @@ class Product extends Model
     ];
 
     protected $casts = [
-        'price_buy' => 'decimal:2',
-        'price_sell' => 'decimal:2',
-        'price_shipping' => 'decimal:2',
+        'price_buy' => 'integer',
+        'price_sell' => 'integer',
+        'price_shipping' => 'integer',
         'status' => ProductStatus::class,
     ];
 

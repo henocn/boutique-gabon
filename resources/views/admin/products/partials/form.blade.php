@@ -21,15 +21,15 @@
         <div class="row g-3">
             <div class="col-md-4">
                 <label class="form-label" for="price_buy">Prix achat</label>
-                <input id="price_buy" name="price_buy" type="number" step="0.01" class="form-control" value="{{ old('price_buy', $product->price_buy) }}" required>
+                <input id="price_buy" name="price_buy" type="number" step="1" min="0" class="form-control" value="{{ old('price_buy', $product->price_buy) }}" required>
             </div>
             <div class="col-md-4">
                 <label class="form-label" for="price_sell">Prix vente</label>
-                <input id="price_sell" name="price_sell" type="number" step="0.01" class="form-control" value="{{ old('price_sell', $product->price_sell) }}" required>
+                <input id="price_sell" name="price_sell" type="number" step="1" min="0" class="form-control" value="{{ old('price_sell', $product->price_sell) }}" required>
             </div>
             <div class="col-md-4">
                 <label class="form-label" for="price_shipping">Livraison</label>
-                <input id="price_shipping" name="price_shipping" type="number" step="0.01" class="form-control" value="{{ old('price_shipping', $product->price_shipping) }}" required>
+                <input id="price_shipping" name="price_shipping" type="number" step="1" min="0" class="form-control" value="{{ old('price_shipping', $product->price_shipping) }}" required>
             </div>
         </div>
         <div class="row g-3 mt-1">
@@ -83,13 +83,13 @@
                 <label class="form-label">Images existantes</label>
                 <div class="d-flex flex-wrap gap-2">
                     @foreach ($product->images as $image)
-                        <label class="border rounded p-2">
-                            <img src="{{ \Illuminate\Support\Facades\Storage::url($image->path) }}" alt="Image" width="64" height="64" class="rounded mb-2">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="remove_images[]" value="{{ $image->id }}" id="remove_image_{{ $image->id }}">
-                                <label class="form-check-label" for="remove_image_{{ $image->id }}">Supprimer</label>
-                            </div>
-                        </label>
+                        <div class="position-relative border rounded p-2">
+                            <input class="btn-check" type="checkbox" name="remove_images[]" value="{{ $image->id }}" id="remove_image_{{ $image->id }}">
+                            <label class="btn btn-sm btn-danger position-absolute top-0 start-0 m-1" for="remove_image_{{ $image->id }}" title="Supprimer">
+                                <i class="bi bi-x"></i>
+                            </label>
+                            <img src="{{ \Illuminate\Support\Facades\Storage::url($image->path) }}" alt="Image" width="64" height="64" class="rounded">
+                        </div>
                     @endforeach
                 </div>
             </div>
