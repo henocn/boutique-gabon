@@ -8,5 +8,6 @@ enum OrderStatus: string
     case Processed = 'processed';
     case Unreachable = 'unreachable';
     case Validated = 'validated';
+    case Delivered = 'delivered';
     case Cancelled = 'cancelled';
 }
