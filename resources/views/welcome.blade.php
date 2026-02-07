@@ -18,6 +18,9 @@
         <nav class="navbar navbar-expand-lg bg-white border-bottom navbar-client fixed-top">
             <div class="container">
                 <a class="navbar-brand fw-bold" href="/">Boutique Gabon</a>
+                <button class="btn btn-sm btn-brand d-lg-none me-2" type="button" data-bs-toggle="modal" data-bs-target="#searchModal" aria-label="Rechercher">
+                    <i class="bi bi-search"></i>
+                </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -46,9 +49,6 @@
                         </li>
                     </ul>
                 </div>
-                <button class="btn btn-sm btn-brand d-lg-none" type="button" data-bs-toggle="modal" data-bs-target="#searchModal" aria-label="Rechercher">
-                    <i class="bi bi-search"></i>
-                </button>
             </div>
         </nav>
 
