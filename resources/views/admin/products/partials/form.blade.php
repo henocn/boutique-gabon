@@ -139,3 +139,7 @@
     })();
 </script>
 @endpush
+
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/trix@2.1.8/dist/trix.css">
+@endpush

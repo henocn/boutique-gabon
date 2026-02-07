@@ -44,7 +44,7 @@
                     <div class="col-lg-6">
                         <p class="text-muted mb-1">{{ $product->category?->name }}</p>
                         <h1 class="h3 fw-bold mb-3">{{ $product->name }}</h1>
-                        <div class="text-muted mb-3">{!! nl2br(e(strip_tags($product->description_html ?? ''))) !!}</div>
+                        <div class="text-muted mb-3 product-detail-desc">{!! $product->description_html !!}</div>
                         <div class="d-flex align-items-center justify-content-between mb-4">
                             <span class="h4 fw-bold mb-0">{{ number_format($product->price_sell, 0, ',', ' ') }} FCFA</span>
                         </div>
