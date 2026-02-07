@@ -94,8 +94,8 @@
                         @forelse ($topSold as $item)
                             <div class="d-flex align-items-center justify-content-between">
                                 <div>
-                                    <div class="fw-semibold">{{ $item->name }}</div>
-                                    <div class="text-muted small">{{ $item->category?->name }}</div>
+                                    <div class="fw-semibold">{{ $item->product?->name }}</div>
+                                    <div class="text-muted small">{{ $item->product?->category?->name }}</div>
                                 </div>
                                 <span class="badge text-bg-secondary">{{ $item->sold_count }}</span>
                             </div>

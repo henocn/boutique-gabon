@@ -38,11 +38,13 @@ class Order extends Model
         'client_contact',
         'client_comment',
         'product_id',
+        'quantity',
         'status',
     ];
 
     protected $casts = [
         'status' => OrderStatus::class,
+        'quantity' => 'integer',
     ];
 
     public function product(): BelongsTo

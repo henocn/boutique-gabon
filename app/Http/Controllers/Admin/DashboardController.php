@@ -30,11 +30,12 @@ class DashboardController extends Controller
         }
 
         $totalOrders = (clone $orderScope)->count();
-        $deliveredOrders = (clone $orderScope)->where('status', $delivered)->count();
+        $deliveredOrders = (clone $orderScope)->where('orders.status', $delivered)->count();
         $deliveredRevenue = (clone $orderScope)
-            ->where('status', $delivered)
+            ->where('orders.status', $delivered)
             ->join('products', 'orders.product_id', '=', 'products.id')
-            ->sum('products.price_sell');
+            ->select(DB::raw('SUM(products.price_sell * COALESCE(orders.quantity, 1)) as revenue'))
+            ->value('revenue') ?? 0;
 
         $orderSeries = $this->buildOrderSeries($user);
 
@@ -56,19 +57,34 @@ class DashboardController extends Controller
                 ->take(6)
                 ->get();
 
-            $topSold = Product::query()
-                ->with('category')
-                ->withCount([
-                    'orders as sold_count' => function ($query) use ($delivered): void {
-                        $query->where('status', $delivered);
-                    },
-                ])
+            $topSoldRows = Order::query()
+                ->select('orders.product_id', DB::raw('SUM(COALESCE(orders.quantity, 1)) as sold_count'))
+                ->join('products', 'orders.product_id', '=', 'products.id')
+                ->where('orders.status', $delivered)
+                ->groupBy('orders.product_id')
                 ->orderByDesc('sold_count')
                 ->take(5)
                 ->get();
 
+            $topSoldProducts = Product::query()
+                ->with('category')
+                ->whereIn('id', $topSoldRows->pluck('product_id'))
+                ->get()
+                ->keyBy('id');
+
+            $topSold = $topSoldRows->map(function ($row) use ($topSoldProducts) {
+                return (object) [
+                    'product' => $topSoldProducts->get($row->product_id),
+                    'sold_count' => (int) $row->sold_count,
+                ];
+            });
+
             $topRevenueRows = Order::query()
-                ->select('orders.product_id', DB::raw('COUNT(*) as sold_count'), DB::raw('SUM(products.price_sell) as revenue'))
+                ->select(
+                    'orders.product_id',
+                    DB::raw('SUM(COALESCE(orders.quantity, 1)) as sold_count'),
+                    DB::raw('SUM(products.price_sell * COALESCE(orders.quantity, 1)) as revenue')
+                )
                 ->join('products', 'orders.product_id', '=', 'products.id')
                 ->where('orders.status', $delivered)
                 ->groupBy('orders.product_id')

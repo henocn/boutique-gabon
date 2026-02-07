@@ -17,6 +17,7 @@
                         <th>#</th>
                         <th>Client</th>
                         <th>Produit</th>
+                        <th>Qt</th>
                         @if (Auth::user()->isAdmin())
                             <th>Manager</th>
                         @endif
@@ -37,6 +38,7 @@
                                 <div class="fw-semibold">{{ $order->product?->name }}</div>
                                 <div class="text-muted small">{{ $order->product?->category?->name }}</div>
                             </td>
+                            <td>{{ $order->quantity ?? 1 }}</td>
                             @if (Auth::user()->isAdmin())
                                 <td>{{ $order->product?->manager?->name }}</td>
                             @endif
@@ -63,7 +65,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted">Aucune commande</td>
+                            <td colspan="8" class="text-center text-muted">Aucune commande</td>
                         </tr>
                     @endforelse
                 </tbody>
