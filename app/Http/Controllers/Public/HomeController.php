@@ -35,7 +35,7 @@ class HomeController extends Controller
             $productsQuery->where('category_id', $selectedCategory);
         }
 
-        $products = $productsQuery->latest()->get();
+        $products = $productsQuery->latest()->paginate(15)->withQueryString();
 
         return view('welcome', compact('categories', 'products', 'search', 'selectedCategory'));
     }
