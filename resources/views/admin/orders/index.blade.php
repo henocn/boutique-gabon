@@ -11,7 +11,7 @@
 
     <ul class="nav nav-pills gap-2 flex-wrap mb-3">
         <li class="nav-item">
-            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'active' ? 'active shadow-sm' : 'bg-white border text-dark' }}"
+            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'active' ? 'bg-white border border-2 border-warning text-warning-emphasis' : 'bg-white border text-dark' }}"
                 href="{{ route('admin.orders.index', ['tab' => 'active']) }}">
                 <span class="fw-semibold">Actives</span>
                 <span class="badge rounded-pill text-bg-danger">{{ $counts['new'] ?? 0 }} Nouv.</span>
@@ -19,21 +19,21 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'unreachable' ? 'active shadow-sm' : 'bg-white border text-dark' }}"
+            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'unreachable' ? 'bg-white border border-2 border-warning text-warning-emphasis' : 'bg-white border text-dark' }}"
                 href="{{ route('admin.orders.index', ['tab' => 'unreachable']) }}">
                 <span class="fw-semibold">Injoignables</span>
                 <span class="badge rounded-pill text-bg-secondary">{{ $counts['unreachable'] ?? 0 }}</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'delivered' ? 'active shadow-sm' : 'bg-white border text-dark' }}"
+            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'delivered' ? 'bg-white border border-2 border-warning text-warning-emphasis' : 'bg-white border text-dark' }}"
                 href="{{ route('admin.orders.index', ['tab' => 'delivered']) }}">
                 <span class="fw-semibold">Livrees</span>
                 <span class="badge rounded-pill text-bg-secondary">{{ $counts['delivered'] ?? 0 }}</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'other' ? 'active shadow-sm' : 'bg-white border text-dark' }}"
+            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'other' ? 'bg-white border border-2 border-warning text-warning-emphasis' : 'bg-white border text-dark' }}"
                 href="{{ route('admin.orders.index', ['tab' => 'other']) }}">
                 <span class="fw-semibold">Autres</span>
                 <span class="badge rounded-pill text-bg-secondary">{{ $counts['other'] ?? 0 }}</span>
@@ -58,7 +58,7 @@
                 </thead>
                 <tbody>
                     @forelse ($orders as $order)
-                        <tr>
+                        <tr class="{{ $order->status === \App\Enums\OrderStatus::Processed ? 'table-success' : '' }}">
                             <td>{{ $order->id }}</td>
                             <td>
                                 <div class="fw-semibold">{{ $order->client_name }}</div>
