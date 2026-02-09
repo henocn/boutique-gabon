@@ -17,7 +17,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        $tab = request('tab', 'new');
+        $tab = request('tab', 'active');
         $baseQuery = Order::query();
 
         if ($user->role === User::ROLE_MANAGER) {
@@ -44,9 +44,6 @@ class OrderController extends Controller
         $query = (clone $baseQuery)->with(['product.category', 'product.manager']);
 
         switch ($tab) {
-            case 'processed':
-                $query->where('status', OrderStatus::Processed);
-                break;
             case 'unreachable':
                 $query->where('status', OrderStatus::Unreachable);
                 break;
@@ -61,10 +58,10 @@ class OrderController extends Controller
                     OrderStatus::Delivered,
                 ]);
                 break;
-            case 'new':
+            case 'active':
             default:
-                $tab = 'new';
-                $query->where('status', OrderStatus::New);
+                $tab = 'active';
+                $query->whereIn('status', [OrderStatus::New, OrderStatus::Processed]);
                 break;
         }
 

@@ -9,40 +9,34 @@
         <div class="alert alert-success">{{ session('status') }}</div>
     @endif
 
-    <ul class="nav nav-tabs mb-3">
+    <ul class="nav nav-pills gap-2 flex-wrap mb-3">
         <li class="nav-item">
-            <a class="nav-link {{ $tab === 'new' ? 'active bg-danger-subtle text-danger border border-danger-subtle' : 'text-danger' }}"
-                href="{{ route('admin.orders.index', ['tab' => 'new']) }}">
-                Nouvelles
-                <span class="badge text-bg-danger ms-1">{{ $counts['new'] ?? 0 }}</span>
+            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'active' ? 'active shadow-sm' : 'bg-white border text-dark' }}"
+                href="{{ route('admin.orders.index', ['tab' => 'active']) }}">
+                <span class="fw-semibold">Actives</span>
+                <span class="badge rounded-pill text-bg-danger">{{ $counts['new'] ?? 0 }} Nouv.</span>
+                <span class="badge rounded-pill text-bg-secondary">{{ $counts['processed'] ?? 0 }} Traitees</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ $tab === 'processed' ? 'active' : '' }}"
-                href="{{ route('admin.orders.index', ['tab' => 'processed']) }}">
-                Traitees
-                <span class="badge text-bg-secondary ms-1">{{ $counts['processed'] ?? 0 }}</span>
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link {{ $tab === 'unreachable' ? 'active' : '' }}"
+            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'unreachable' ? 'active shadow-sm' : 'bg-white border text-dark' }}"
                 href="{{ route('admin.orders.index', ['tab' => 'unreachable']) }}">
-                Injoignables
-                <span class="badge text-bg-secondary ms-1">{{ $counts['unreachable'] ?? 0 }}</span>
+                <span class="fw-semibold">Injoignables</span>
+                <span class="badge rounded-pill text-bg-secondary">{{ $counts['unreachable'] ?? 0 }}</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ $tab === 'delivered' ? 'active' : '' }}"
+            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'delivered' ? 'active shadow-sm' : 'bg-white border text-dark' }}"
                 href="{{ route('admin.orders.index', ['tab' => 'delivered']) }}">
-                Livrees
-                <span class="badge text-bg-secondary ms-1">{{ $counts['delivered'] ?? 0 }}</span>
+                <span class="fw-semibold">Livrees</span>
+                <span class="badge rounded-pill text-bg-secondary">{{ $counts['delivered'] ?? 0 }}</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link {{ $tab === 'other' ? 'active' : '' }}"
+            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'other' ? 'active shadow-sm' : 'bg-white border text-dark' }}"
                 href="{{ route('admin.orders.index', ['tab' => 'other']) }}">
-                Autres
-                <span class="badge text-bg-secondary ms-1">{{ $counts['other'] ?? 0 }}</span>
+                <span class="fw-semibold">Autres</span>
+                <span class="badge rounded-pill text-bg-secondary">{{ $counts['other'] ?? 0 }}</span>
             </a>
         </li>
     </ul>
@@ -55,10 +49,8 @@
                         <th>#</th>
                         <th>Client</th>
                         <th>Produit</th>
+                        <th>Prix vente</th>
                         <th>Qt</th>
-                        @if (Auth::user()->isAdmin())
-                            <th>Manager</th>
-                        @endif
                         <th>Statut</th>
                         <th>Date</th>
                         <th class="text-end">Action</th>
@@ -76,10 +68,14 @@
                                 <div class="fw-semibold">{{ $order->product?->name }}</div>
                                 <div class="text-muted small">{{ $order->product?->category?->name }}</div>
                             </td>
+                            <td>
+                                @if ($order->product?->price_sell !== null)
+                                    {{ number_format($order->product?->price_sell, 0, ',', ' ') }} FCFA
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
                             <td>{{ $order->quantity ?? 1 }}</td>
-                            @if (Auth::user()->isAdmin())
-                                <td>{{ $order->product?->manager?->name }}</td>
-                            @endif
                             <td>
                                 <span class="badge text-bg-secondary">{{ ucfirst(str_replace('_', ' ', $order->status->value)) }}</span>
                             </td>
