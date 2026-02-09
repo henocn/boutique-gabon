@@ -17,18 +17,61 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        $query = Order::query()->with(['product.category', 'product.manager']);
+        $tab = request('tab', 'new');
+        $baseQuery = Order::query();
 
         if ($user->role === User::ROLE_MANAGER) {
-            $query->whereHas('product', function ($builder) use ($user): void {
+            $baseQuery->whereHas('product', function ($builder) use ($user): void {
                 $builder->where('manager_id', $user->id);
             });
         }
 
-        $orders = $query->latest()->paginate(15);
+        $counts = [
+            'new' => (clone $baseQuery)->where('status', OrderStatus::New)->count(),
+            'processed' => (clone $baseQuery)->where('status', OrderStatus::Processed)->count(),
+            'unreachable' => (clone $baseQuery)->where('status', OrderStatus::Unreachable)->count(),
+            'delivered' => (clone $baseQuery)->where('status', OrderStatus::Delivered)->count(),
+            'other' => (clone $baseQuery)
+                ->whereNotIn('status', [
+                    OrderStatus::New,
+                    OrderStatus::Processed,
+                    OrderStatus::Unreachable,
+                    OrderStatus::Delivered,
+                ])
+                ->count(),
+        ];
+
+        $query = (clone $baseQuery)->with(['product.category', 'product.manager']);
+
+        switch ($tab) {
+            case 'processed':
+                $query->where('status', OrderStatus::Processed);
+                break;
+            case 'unreachable':
+                $query->where('status', OrderStatus::Unreachable);
+                break;
+            case 'delivered':
+                $query->where('status', OrderStatus::Delivered);
+                break;
+            case 'other':
+                $query->whereNotIn('status', [
+                    OrderStatus::New,
+                    OrderStatus::Processed,
+                    OrderStatus::Unreachable,
+                    OrderStatus::Delivered,
+                ]);
+                break;
+            case 'new':
+            default:
+                $tab = 'new';
+                $query->where('status', OrderStatus::New);
+                break;
+        }
+
+        $orders = $query->latest()->paginate(15)->withQueryString();
         $statuses = OrderStatus::cases();
 
-        return view('admin.orders.index', compact('orders', 'statuses'));
+        return view('admin.orders.index', compact('orders', 'statuses', 'counts', 'tab'));
     }
 
     public function update(OrderUpdateRequest $request, Order $order): RedirectResponse

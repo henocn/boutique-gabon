@@ -9,6 +9,44 @@
         <div class="alert alert-success">{{ session('status') }}</div>
     @endif
 
+    <ul class="nav nav-tabs mb-3">
+        <li class="nav-item">
+            <a class="nav-link {{ $tab === 'new' ? 'active bg-danger-subtle text-danger border border-danger-subtle' : 'text-danger' }}"
+                href="{{ route('admin.orders.index', ['tab' => 'new']) }}">
+                Nouvelles
+                <span class="badge text-bg-danger ms-1">{{ $counts['new'] ?? 0 }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ $tab === 'processed' ? 'active' : '' }}"
+                href="{{ route('admin.orders.index', ['tab' => 'processed']) }}">
+                Traitees
+                <span class="badge text-bg-secondary ms-1">{{ $counts['processed'] ?? 0 }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ $tab === 'unreachable' ? 'active' : '' }}"
+                href="{{ route('admin.orders.index', ['tab' => 'unreachable']) }}">
+                Injoignables
+                <span class="badge text-bg-secondary ms-1">{{ $counts['unreachable'] ?? 0 }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ $tab === 'delivered' ? 'active' : '' }}"
+                href="{{ route('admin.orders.index', ['tab' => 'delivered']) }}">
+                Livrees
+                <span class="badge text-bg-secondary ms-1">{{ $counts['delivered'] ?? 0 }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {{ $tab === 'other' ? 'active' : '' }}"
+                href="{{ route('admin.orders.index', ['tab' => 'other']) }}">
+                Autres
+                <span class="badge text-bg-secondary ms-1">{{ $counts['other'] ?? 0 }}</span>
+            </a>
+        </li>
+    </ul>
+
     <div class="card card-soft p-3">
         <div class="table-responsive">
             <table class="table align-middle mb-0">
