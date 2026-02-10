@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ config('app.name', 'Boutique Gabon') }}</title>
+        <title>{{ config('app.shop_name', config('app.name')) }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700" rel="stylesheet" />
@@ -17,12 +17,15 @@
         @endphp
         <nav class="navbar navbar-expand-lg bg-white border-bottom navbar-client fixed-top">
             <div class="container">
-                <a class="navbar-brand fw-bold" href="/">Boutique Gabon</a>
+                <a class="navbar-brand fw-bold" href="/">{{ config('app.shop_name', config('app.name')) }}</a>
+                <button class="btn btn-sm btn-brand d-lg-none me-2" type="button" data-bs-toggle="modal" data-bs-target="#searchModal" aria-label="Rechercher">
+                    <i class="bi bi-search"></i>
+                </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="mainNav">
-                    <form class="d-flex align-items-center gap-2 ms-lg-4 me-lg-auto mt-3 mt-lg-0" method="GET" action="/">
+                    <form class="d-none d-lg-flex align-items-center gap-2 ms-lg-4 me-lg-auto" method="GET" action="/">
                         <input class="form-control form-control-sm navbar-search" type="search" name="q" value="{{ $search }}" placeholder="Rechercher un produit">
                         @if ($selectedCategory)
                             <input type="hidden" name="category" value="{{ $selectedCategory }}">
@@ -52,11 +55,8 @@
         <section id="products" class="py-5 bg-white">
             <div class="container">
                 <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
-                    <div>
-                        <h2 class="h3 fw-bold mb-1">Produits</h2>
-                        <p class="text-muted mb-0">Trouvez rapidement ce qui vous plait.</p>
-                    </div>
-                    <form class="d-flex align-items-center gap-2 flex-wrap flex-lg-nowrap filter-row" method="GET" action="/">
+                    <h2 class="h3 fw-bold mb-1">Produits</h2>
+                    <form class="d-flex align-items-center gap-2 flex-nowrap filter-row" method="GET" action="/">
                         @if ($search)
                             <input type="hidden" name="q" value="{{ $search }}">
                         @endif
@@ -70,6 +70,9 @@
                         </select>
                         <button class="btn btn-brand" type="submit">Filtrer</button>
                     </form>
+                    <div>
+                        <p class="text-muted mb-0">Parcourez la liste de nos produits, trouvez rapidement ce qui vous plait et passez votre commande.</p>
+                    </div>
                 </div>
                 @if (session('status'))
                     <div class="alert alert-success">{{ session('status') }}</div>
@@ -79,7 +82,7 @@
                         @php
                             $firstImage = $product->productImages->first();
                         @endphp
-                        <div class="col-6 col-lg-4">
+                        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
                             <div class="card product-card h-100">
                                 <div class="ratio ratio-4x3 bg-light overflow-hidden">
                                     @if ($firstImage)
@@ -167,9 +170,35 @@
             </div>
         </div>
 
+        <div class="modal fade" id="searchModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form method="GET" action="/">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Rechercher</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            <input class="form-control" type="search" name="q" value="{{ $search }}" placeholder="Rechercher un produit">
+                            @if ($selectedCategory)
+                                <input type="hidden" name="category" value="{{ $selectedCategory }}">
+                            @endif
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-brand">
+                                <i class="bi bi-search"></i>
+                                Rechercher
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
         <footer class="py-4 border-top bg-white">
             <div class="container d-flex flex-wrap justify-content-between align-items-center">
-                <p class="mb-0 text-muted">{{ date('Y') }} Boutique Gabon. Tous droits reserves.</p>
+                <p class="mb-0 text-muted">{{ date('Y') }} {{ config('app.shop_name', config('app.name')) }}. Tous droits reserves.</p>
                 <span class="text-muted">Support: +241 00 00 00 00</span>
             </div>
         </footer>

@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ $product->name }} - {{ config('app.name', 'Boutique Gabon') }}</title>
+        <title>{{ $product->name }} - {{ config('app.shop_name', config('app.name')) }}</title>
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700" rel="stylesheet" />
@@ -14,7 +14,7 @@
     <body>
         <nav class="navbar navbar-expand-lg bg-white border-bottom navbar-client fixed-top">
             <div class="container">
-                <a class="navbar-brand fw-bold" href="/">Boutique Gabon</a>
+                <a class="navbar-brand fw-bold" href="/">{{ config('app.shop_name', config('app.name')) }}</a>
                 <div class="d-flex align-items-center gap-2 ms-auto">
                     <a class="btn btn-outline-secondary" href="/">Retour</a>
                     <a class="btn btn-brand position-relative" href="{{ route('cart.index') }}">
@@ -36,20 +36,35 @@
                 <div class="product-detail card-soft p-4">
                     <div class="row g-4">
                         <div class="col-lg-6">
-                            <div class="ratio ratio-4x3 bg-light border product-hero-image rounded-3 overflow-hidden">
-                                @php($firstImage = $images->first())
-                                @if ($firstImage)
-                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($firstImage->path) }}" alt="{{ $product->name }}" class="w-100 h-100 object-fit-cover">
-                                @else
-                                    <div class="d-flex align-items-center justify-content-center text-muted">Aucune image</div>
+                            <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                                <div class="carousel-inner ratio ratio-4x3 bg-light border product-hero-image rounded-3 overflow-hidden">
+                                    @forelse ($images as $index => $image)
+                                        <div class="carousel-item @if ($index === 0) active @endif">
+                                            <img src="{{ \Illuminate\Support\Facades\Storage::url($image->path) }}" alt="{{ $product->name }}" class="d-block w-100 h-100 object-fit-cover">
+                                        </div>
+                                    @empty
+                                        <div class="carousel-item active">
+                                            <div class="d-flex align-items-center justify-content-center text-muted h-100">Aucune image</div>
+                                        </div>
+                                    @endforelse
+                                </div>
+                                @if ($images->count() > 1)
+                                    <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Precedent</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Suivant</span>
+                                    </button>
                                 @endif
                             </div>
                             @if ($images->count() > 1)
                                 <div class="d-flex gap-2 mt-3 flex-wrap">
-                                    @foreach ($images->slice(1) as $image)
-                                        <div class="product-thumb border rounded-3 overflow-hidden">
+                                    @foreach ($images as $index => $image)
+                                        <button class="product-thumb border rounded-3 overflow-hidden" type="button" data-bs-target="#productCarousel" data-bs-slide-to="{{ $index }}" aria-label="Image {{ $index + 1 }}">
                                             <img src="{{ \Illuminate\Support\Facades\Storage::url($image->path) }}" alt="{{ $product->name }}" class="w-100 h-100 object-fit-cover">
-                                        </div>
+                                        </button>
                                     @endforeach
                                 </div>
                             @endif

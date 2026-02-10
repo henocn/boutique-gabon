@@ -5,6 +5,8 @@
 	--brand-500: #f28c28;
 	--brand-600: #e5791f;
 	--brand-700: #c96514;
+	--accent-500: #2f6f6d;
+	--accent-100: #e6f3f2;
 	--ink-900: #1b1f24;
 	--ink-700: #3a3f46;
 	--ink-500: #6b7178;
@@ -52,9 +54,15 @@ body {
 	border: 1px solid #f3d7b2;
 }
 
+.text-accent {
+	color: var(--accent-500) !important;
+}
+
 .navbar-client {
 	min-height: 80px;
+	background: linear-gradient(90deg, #fff7ea 0%, var(--accent-100) 100%);
 	backdrop-filter: blur(12px);
+	border-bottom: 1px solid #f0e1d0;
 }
 
 .navbar-client .nav-link {
@@ -79,6 +87,7 @@ body {
 	min-width: 240px;
 }
 
+
 .filter-row .form-select {
 	min-width: 220px;
 }
@@ -89,6 +98,7 @@ body {
 	box-shadow: var(--shadow-soft);
 	overflow: hidden;
 }
+
 
 .product-body {
 	padding: 0.85rem 1rem 1rem;
@@ -121,6 +131,8 @@ body {
 	width: 84px;
 	height: 84px;
 	flex: 0 0 auto;
+	background: transparent;
+	padding: 0;
 }
 
 .product-detail-summary {

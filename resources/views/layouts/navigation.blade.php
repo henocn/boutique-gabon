@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-lg bg-white border-bottom navbar-client fixed-top">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="{{ route('dashboard') }}">Boutique Gabon</a>
+        <a class="navbar-brand fw-bold" href="{{ route('dashboard') }}">{{ config('app.shop_name', config('app.name')) }}</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#adminNav" aria-controls="adminNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
