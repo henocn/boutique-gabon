@@ -35,11 +35,7 @@
                     <ul class="navbar-nav align-items-lg-center gap-lg-3">
                         <li class="nav-item"><a class="nav-link" href="#products">Produits</a></li>
                         <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
-                        <li class="nav-item">
-                            <button class="btn btn-brand position-relative" type="button" data-bs-toggle="modal" data-bs-target="#orderModal" aria-label="Commander">
-                                <i class="bi bi-cart"></i>
-                            </button>
-                        </li>
+                        {{-- Icône panier supprimée du header --}}
                     </ul>
                 </div>
             </div>
