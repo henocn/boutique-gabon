@@ -12,9 +12,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body>
-        @php
-            $cartCount = array_sum(session('cart', []));
-        @endphp
+        {{-- Panier logic supprimé --}}
         <nav class="navbar navbar-expand-lg bg-white border-bottom navbar-client fixed-top">
             <div class="container">
                 <a class="navbar-brand fw-bold" href="/">{{ config('app.shop_name', config('app.name')) }}</a>
@@ -37,16 +35,7 @@
                     <ul class="navbar-nav align-items-lg-center gap-lg-3">
                         <li class="nav-item"><a class="nav-link" href="#products">Produits</a></li>
                         <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
-                        <li class="nav-item">
-                            <a class="btn btn-brand position-relative" href="{{ route('cart.index') }}">
-                                Mon panier
-                                @if ($cartCount > 0)
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-brand">
-                                        {{ $cartCount }}
-                                    </span>
-                                @endif
-                            </a>
-                        </li>
+                        {{-- Panier UI supprimé --}}
                     </ul>
                 </div>
             </div>
@@ -95,9 +84,7 @@
                                     <p class="text-muted small product-desc mb-2">{{ strip_tags($product->description_html ?? '') }}</p>
                                     <div class="d-flex align-items-center justify-content-between product-actions">
                                         <span class="fw-bold">{{ number_format($product->price_sell, 0, ',', ' ') }} FCFA</span>
-                                        <button class="btn btn-brand btn-cart" type="button" data-bs-toggle="modal" data-bs-target="#orderModal" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" aria-label="Ajouter au panier">
-                                            <i class="bi bi-cart"></i>
-                                        </button>
+                                        {{-- Ajout panier supprimé --}}
                                     </div>
                                 </div>
                             </div>
@@ -147,31 +134,7 @@
             </div>
         </section>
 
-        <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <form method="POST" action="{{ route('cart.add') }}">
-                        @csrf
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="orderModalLabel">Ajouter au panier</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                        </div>
-                        <div class="modal-body">
-                            <input type="hidden" name="product_id" id="orderProductId">
-                            <p class="fw-semibold mb-3" id="orderProductName"></p>
-                            <div class="mb-3">
-                                <label class="form-label" for="orderQuantity">Quantite</label>
-                                <input id="orderQuantity" name="quantity" type="number" min="1" max="99" value="1" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <button type="submit" class="btn btn-brand">Ajouter</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+        {{-- Modal panier supprimé --}}
 
         <div class="modal fade" id="searchModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -205,21 +168,6 @@
                 <span class="text-muted">Support: +241 00 00 00 00</span>
             </div>
         </footer>
-        <script>
-            (function () {
-                var modal = document.getElementById('orderModal');
-                if (!modal) {
-                    return;
-                }
-                modal.addEventListener('show.bs.modal', function (event) {
-                    var button = event.relatedTarget;
-                    var productId = button.getAttribute('data-product-id');
-                    var productName = button.getAttribute('data-product-name');
-                    document.getElementById('orderProductId').value = productId;
-                    document.getElementById('orderProductName').textContent = productName;
-                    document.getElementById('orderQuantity').value = 1;
-                });
-            })();
-        </script>
+        {{-- Script panier supprimé --}}
     </body>
 </html>
