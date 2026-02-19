@@ -1,3 +1,5 @@
+use App\Http\Controllers\Public\OrderModalController;
+Route::post('/order-modal', [OrderModalController::class, 'store'])->name('order.modal.store');
 <?php
 
 use App\Http\Controllers\Admin\CategoryController;

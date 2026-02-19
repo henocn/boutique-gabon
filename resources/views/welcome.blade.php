@@ -35,7 +35,11 @@
                     <ul class="navbar-nav align-items-lg-center gap-lg-3">
                         <li class="nav-item"><a class="nav-link" href="#products">Produits</a></li>
                         <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
-                        {{-- Panier UI supprimé --}}
+                        <li class="nav-item">
+                            <button class="btn btn-brand position-relative" type="button" data-bs-toggle="modal" data-bs-target="#orderModal" aria-label="Commander">
+                                <i class="bi bi-cart"></i>
+                            </button>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -84,7 +88,9 @@
                                     <p class="text-muted small product-desc mb-2">{{ strip_tags($product->description_html ?? '') }}</p>
                                     <div class="d-flex align-items-center justify-content-between product-actions">
                                         <span class="fw-bold">{{ number_format($product->price_sell, 0, ',', ' ') }} FCFA</span>
-                                        {{-- Ajout panier supprimé --}}
+                                        <button class="btn btn-brand btn-cart" type="button" data-bs-toggle="modal" data-bs-target="#orderModal" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" aria-label="Commander">
+                                            <i class="bi bi-cart"></i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -134,7 +140,42 @@
             </div>
         </section>
 
-        {{-- Modal panier supprimé --}}
+        <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('order.modal.store') }}">
+                        @csrf
+                        @php($orderClient = session('order_client', []))
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="orderModalLabel">Commander</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label class="form-label" for="clientName">Nom complet</label>
+                                <input id="clientName" name="client_name" type="text" class="form-control" value="{{ old('client_name', $orderClient['client_name'] ?? '') }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="clientContact">Contact</label>
+                                <input id="clientContact" name="client_contact" type="text" class="form-control" value="{{ old('client_contact', $orderClient['client_contact'] ?? '') }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="clientAddress">Adresse</label>
+                                <input id="clientAddress" name="client_address" type="text" class="form-control" value="{{ old('client_address', $orderClient['client_address'] ?? '') }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="orderQuantity">Quantité</label>
+                                <input id="orderQuantity" name="quantity" type="number" min="1" max="99" value="1" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" class="btn btn-brand">Valider</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         <div class="modal fade" id="searchModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
@@ -168,6 +209,20 @@
                 <span class="text-muted">Support: +241 00 00 00 00</span>
             </div>
         </footer>
-        {{-- Script panier supprimé --}}
+        <script>
+            (function () {
+                var modal = document.getElementById('orderModal');
+                if (!modal) {
+                    return;
+                }
+                modal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget;
+                    if (button && button.hasAttribute('data-product-id')) {
+                        // Optionally, set product info in modal if needed
+                    }
+                    document.getElementById('orderQuantity').value = 1;
+                });
+            })();
+        </script>
     </body>
 </html>
