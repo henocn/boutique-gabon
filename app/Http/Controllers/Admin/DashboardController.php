@@ -31,11 +31,26 @@ class DashboardController extends Controller
 
         $totalOrders = (clone $orderScope)->count();
         $deliveredOrders = (clone $orderScope)->where('orders.status', $delivered)->count();
+        $pendingOrders = (clone $orderScope)->where('orders.status', OrderStatus::New)->count();
+        $cancelledOrders = (clone $orderScope)->where('orders.status', OrderStatus::Cancelled)->count();
         $deliveredRevenue = (clone $orderScope)
             ->where('orders.status', $delivered)
             ->join('products', 'orders.product_id', '=', 'products.id')
             ->select(DB::raw('SUM(products.price_sell * COALESCE(orders.quantity, 1)) as revenue'))
             ->value('revenue') ?? 0;
+        $totalBenefit = (clone $orderScope)
+            ->where('orders.status', $delivered)
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->select(DB::raw('SUM((products.price_sell - products.price_buy) * COALESCE(orders.quantity, 1)) as benefit'))
+            ->value('benefit') ?? 0;
+
+
+        // Statistiques utilisateurs
+        $totalUsers = User::count();
+        $adminUsers = User::where('role', User::ROLE_ADMIN)->count();
+        $managerUsers = User::where('role', User::ROLE_MANAGER)->count();
+        $activeUsers = User::where('is_active', true)->count();
+        $inactiveUsers = User::where('is_active', false)->count();
 
         $orderSeries = $this->buildOrderSeries($user);
 
@@ -43,13 +58,51 @@ class DashboardController extends Controller
             'isAdmin' => $user->isAdmin(),
             'totalOrders' => $totalOrders,
             'deliveredOrders' => $deliveredOrders,
+            'pendingOrders' => $pendingOrders,
+            'cancelledOrders' => $cancelledOrders,
             'deliveredRevenue' => (int) $deliveredRevenue,
+            'totalBenefit' => (int) $totalBenefit,
             'orderSeries' => $orderSeries,
+            'totalUsers' => $totalUsers,
+            'adminUsers' => $adminUsers,
+            'managerUsers' => $managerUsers,
+            'activeUsers' => $activeUsers,
+            'inactiveUsers' => $inactiveUsers,
         ];
 
         if ($user->isAdmin()) {
+                        // Top vendeurs (managers/assistantes)
+                        $topSellersRows = Order::query()
+                            ->select(
+                                'products.manager_id',
+                                DB::raw('COUNT(orders.id) as total_sales'),
+                                DB::raw('SUM(products.price_sell * COALESCE(orders.quantity, 1)) as total_revenue'),
+                                DB::raw('SUM((products.price_sell - products.price_buy) * COALESCE(orders.quantity, 1)) as total_benefit')
+                            )
+                            ->join('products', 'orders.product_id', '=', 'products.id')
+                            ->where('orders.status', $delivered)
+                            ->groupBy('products.manager_id')
+                            ->orderByDesc('total_sales')
+                            ->take(10)
+                            ->get();
+
+                        $managers = User::query()
+                            ->whereIn('id', $topSellersRows->pluck('manager_id'))
+                            ->get()
+                            ->keyBy('id');
+
+                        $topSellers = $topSellersRows->map(function ($row) use ($managers) {
+                            return [
+                                'user' => $managers->get($row->manager_id),
+                                'total_sales' => (int) $row->total_sales,
+                                'total_revenue' => (int) $row->total_revenue,
+                                'total_benefit' => (int) $row->total_benefit,
+                            ];
+                        })->sortByDesc('total_sales')->values();
             $activeCategories = Category::query()->where('is_active', true)->count();
+            $totalCategories = Category::query()->count();
             $activeProducts = Product::query()->where('status', ProductStatus::Active)->count();
+            $totalProducts = Product::query()->count();
 
             $latestProducts = Product::query()
                 ->with(['category', 'productImages'])
@@ -107,10 +160,13 @@ class DashboardController extends Controller
 
             $data = array_merge($data, [
                 'activeCategories' => $activeCategories,
+                'totalCategories' => $totalCategories,
                 'activeProducts' => $activeProducts,
+                'totalProducts' => $totalProducts,
                 'latestProducts' => $latestProducts,
                 'topSold' => $topSold,
                 'topRevenue' => $topRevenue,
+                'topSellers' => $topSellers,
             ]);
         }
 
