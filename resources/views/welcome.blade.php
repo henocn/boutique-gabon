@@ -285,9 +285,11 @@
                         document.getElementById('orderProductId').value = button.getAttribute('data-product-id');
                     }
                     document.getElementById('orderQuantity').value = 1;
-                    document.getElementById('clientName').value = getCookie('order_client_name') || '';
-                    document.getElementById('clientContact').value = getCookie('order_client_contact') || '';
-                    document.getElementById('clientAddress').value = getCookie('order_client_address') || '';
+                    setTimeout(function() {
+                        document.getElementById('clientName').value = getCookie('order_client_name') || '';
+                        document.getElementById('clientContact').value = getCookie('order_client_contact') || '';
+                        document.getElementById('clientAddress').value = getCookie('order_client_address') || '';
+                    }, 50);
                 });
                 // On submit, save client info to cookies
                 var form = modal.querySelector('form');
