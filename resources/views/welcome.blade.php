@@ -191,21 +191,21 @@
                                     <label class="form-label" for="clientName">Nom complet</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <input id="clientName" name="client_name" type="text" class="form-control" required>
+                                        <input id="clientName" name="client_name" type="text" class="form-control" required value="{{ old('client_name', session('order_client_name')) }}">
                                     </div>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     <label class="form-label" for="clientContact">Contact</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                                        <input id="clientContact" name="client_contact" type="text" class="form-control" required>
+                                        <input id="clientContact" name="client_contact" type="text" class="form-control" required value="{{ old('client_contact', session('order_client_contact')) }}">
                                     </div>
                                 </div>
                                 <div class="col-12">
                                     <label class="form-label" for="clientAddress">Adresse</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                        <input id="clientAddress" name="client_address" type="text" class="form-control">
+                                        <input id="clientAddress" name="client_address" type="text" class="form-control" value="{{ old('client_address', session('order_client_address')) }}">
                                     </div>
                                 </div>
                                 <input type="hidden" name="product_id" id="orderProductId">
@@ -268,22 +268,7 @@
             </div>
         </footer>
         <script>
-            // Prefill modal fields from cookies
-            function getCookie(name) {
-                let value = "; " + document.cookie;
-                let parts = value.split("; " + name + "=");
-                if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
-                return '';
-            }
-            function setCookie(name, value, days = 365) {
-                let expires = "";
-                if (days) {
-                    let date = new Date();
-                    date.setTime(date.getTime() + (days*24*60*60*1000));
-                    expires = "; expires=" + date.toUTCString();
-                }
-                document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
-            }
+            // Prefill modal fields from session handled by backend, plus gestion du product_id
             (function () {
                 var modal = document.getElementById('orderModal');
                 if (!modal) return;
@@ -293,18 +278,6 @@
                         document.getElementById('orderProductId').value = button.getAttribute('data-product-id');
                     }
                     document.getElementById('orderQuantity').value = 1;
-                    setTimeout(function() {
-                        document.getElementById('clientName').value = getCookie('order_client_name') || '';
-                        document.getElementById('clientContact').value = getCookie('order_client_contact') || '';
-                        document.getElementById('clientAddress').value = getCookie('order_client_address') || '';
-                    }, 50);
-                });
-                // On submit, save client info to cookies
-                var form = modal.querySelector('form');
-                form.addEventListener('submit', function() {
-                    setCookie('order_client_name', document.getElementById('clientName').value);
-                    setCookie('order_client_contact', document.getElementById('clientContact').value);
-                    setCookie('order_client_address', document.getElementById('clientAddress').value);
                 });
             })();
         </script>

@@ -19,23 +19,44 @@ class OrderModalController extends Controller
             'product_id' => ['required', 'integer'],
         ]);
 
-        // Save client info in cookies for next time
-        $cookieName = cookie('order_client_name', $data['client_name'], 525600); // 1 year
-        $cookieContact = cookie('order_client_contact', $data['client_contact'], 525600);
-        $cookieAddress = cookie('order_client_address', $data['client_address'] ?? '', 525600);
-
+        // Utiliser la session pour limiter la commande par produit pendant 2h
         $productId = $data['product_id'];
-        $cookieKey = 'ordered_' . $productId;
-        $orderedAt = $request->cookie($cookieKey);
+        $sessionKey = 'ordered_' . $productId;
+        $orderedAt = session($sessionKey);
         $now = now()->timestamp;
         if ($orderedAt && ($now - (int)$orderedAt) < 7200) {
             return back()->withErrors(['order' => 'Vous avez déjà commandé ce produit il y a moins de 2 heures.']);
         }
-        // Set cookie for 2h
-        return back()->with('status', 'Votre commande a bien été prise en compte !')
-            ->withCookie(cookie($cookieKey, $now, 120))
-            ->withCookie($cookieName)
-            ->withCookie($cookieContact)
-            ->withCookie($cookieAddress);
+
+        // Création de la commande
+        $orderData = [
+            'client_name' => $data['client_name'],
+            'client_contact' => $data['client_contact'],
+            'client_comment' => $request->input('client_comment'),
+            'client_address' => $data['client_address'] ?? null,
+            'product_id' => $productId,
+            'quantity' => max(1, (int) $request->input('quantity', 1)),
+            'status' => \App\Enums\OrderStatus::New,
+        ];
+        // On retire client_address si la colonne n'existe pas
+        if (!\Schema::hasColumn('orders', 'client_address')) {
+            unset($orderData['client_address']);
+        }
+        \App\Models\Order::create($orderData);
+
+        // Stocker les infos client en session pour pré-remplir le formulaire
+        session([
+            'order_client_name' => $data['client_name'],
+            'order_client_contact' => $data['client_contact'],
+            'order_client_address' => $data['client_address'] ?? '',
+            $sessionKey => $now,
+        ]);
+
+        return back()->with('status', 'Votre commande a bien été prise en compte !');
+    }
+
+    public function create(Request $request): RedirectResponse
+    {
+        return redirect('/')->with('status', 'Commande envoyée.');
     }
 }
