@@ -178,33 +178,49 @@
                 <div class="modal-content">
                     <form method="POST" action="{{ route('order.modal.store') }}">
                         @csrf
-                        @php($orderClient = session('order_client', []))
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="orderModalLabel">Commander</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        <div class="modal-header bg-brand text-white rounded-top-3">
+                            <h5 class="modal-title d-flex align-items-center gap-2" id="orderModalLabel">
+                                <i class="bi bi-cart-check"></i>
+                                Commander
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label class="form-label" for="clientName">Nom complet</label>
-                                <input id="clientName" name="client_name" type="text" class="form-control" value="{{ old('client_name', $orderClient['client_name'] ?? '') }}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="clientContact">Contact</label>
-                                <input id="clientContact" name="client_contact" type="text" class="form-control" value="{{ old('client_contact', $orderClient['client_contact'] ?? '') }}" required>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label" for="clientAddress">Adresse</label>
-                                <input id="clientAddress" name="client_address" type="text" class="form-control" value="{{ old('client_address', $orderClient['client_address'] ?? '') }}">
-                            </div>
-                            <input type="hidden" name="product_id" id="orderProductId">
-                            <div class="mb-3">
-                                <label class="form-label" for="orderQuantity">Quantité</label>
-                                <input id="orderQuantity" name="quantity" type="number" min="1" max="99" value="1" class="form-control" required>
+                        <div class="modal-body px-4 py-3">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label" for="clientName">Nom complet</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                        <input id="clientName" name="client_name" type="text" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label" for="clientContact">Contact</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                        <input id="clientContact" name="client_contact" type="text" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" for="clientAddress">Adresse</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                        <input id="clientAddress" name="client_address" type="text" class="form-control">
+                                    </div>
+                                </div>
+                                <input type="hidden" name="product_id" id="orderProductId">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label" for="orderQuantity">Quantité</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-123"></i></span>
+                                        <input id="orderQuantity" name="quantity" type="number" min="1" max="99" value="1" class="form-control" required>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <button type="submit" class="btn btn-brand">Valider</button>
+                        <div class="modal-footer bg-light rounded-bottom-3">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x"></i> Annuler</button>
+                            <button type="submit" class="btn btn-brand"><i class="bi bi-check2-circle"></i> Valider</button>
                         </div>
                     </form>
                 </div>
@@ -244,17 +260,41 @@
             </div>
         </footer>
         <script>
+            // Prefill modal fields from cookies
+            function getCookie(name) {
+                let value = "; " + document.cookie;
+                let parts = value.split("; " + name + "=");
+                if (parts.length === 2) return decodeURIComponent(parts.pop().split(';').shift());
+                return '';
+            }
+            function setCookie(name, value, days = 365) {
+                let expires = "";
+                if (days) {
+                    let date = new Date();
+                    date.setTime(date.getTime() + (days*24*60*60*1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
+            }
             (function () {
                 var modal = document.getElementById('orderModal');
-                if (!modal) {
-                    return;
-                }
+                if (!modal) return;
                 modal.addEventListener('show.bs.modal', function (event) {
                     var button = event.relatedTarget;
                     if (button && button.hasAttribute('data-product-id')) {
                         document.getElementById('orderProductId').value = button.getAttribute('data-product-id');
                     }
                     document.getElementById('orderQuantity').value = 1;
+                    document.getElementById('clientName').value = getCookie('order_client_name') || '';
+                    document.getElementById('clientContact').value = getCookie('order_client_contact') || '';
+                    document.getElementById('clientAddress').value = getCookie('order_client_address') || '';
+                });
+                // On submit, save client info to cookies
+                var form = modal.querySelector('form');
+                form.addEventListener('submit', function() {
+                    setCookie('order_client_name', document.getElementById('clientName').value);
+                    setCookie('order_client_contact', document.getElementById('clientContact').value);
+                    setCookie('order_client_address', document.getElementById('clientAddress').value);
                 });
             })();
         </script>

@@ -18,7 +18,11 @@ class OrderModalController extends Controller
             'client_address' => ['nullable', 'string', 'max:255'],
             'product_id' => ['required', 'integer'],
         ]);
-        Session::put('order_client', $data);
+
+        // Save client info in cookies for next time
+        $cookieName = cookie('order_client_name', $data['client_name'], 525600); // 1 year
+        $cookieContact = cookie('order_client_contact', $data['client_contact'], 525600);
+        $cookieAddress = cookie('order_client_address', $data['client_address'] ?? '', 525600);
 
         $productId = $data['product_id'];
         $cookieKey = 'ordered_' . $productId;
@@ -29,6 +33,9 @@ class OrderModalController extends Controller
         }
         // Set cookie for 2h
         return back()->with('status', 'Votre commande a bien été prise en compte !')
-            ->withCookie(cookie($cookieKey, $now, 120));
+            ->withCookie(cookie($cookieKey, $now, 120))
+            ->withCookie($cookieName)
+            ->withCookie($cookieContact)
+            ->withCookie($cookieAddress);
     }
 }
