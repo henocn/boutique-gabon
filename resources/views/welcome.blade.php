@@ -12,9 +12,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body>
-        @php
-            $cartCount = array_sum(session('cart', []));
-        @endphp
+        {{-- Panier logic supprimé --}}
         <nav class="navbar navbar-expand-lg bg-white border-bottom navbar-client fixed-top">
             <div class="container">
                 <a class="navbar-brand fw-bold" href="/">{{ config('app.shop_name', config('app.name')) }}</a>
@@ -37,16 +35,7 @@
                     <ul class="navbar-nav align-items-lg-center gap-lg-3">
                         <li class="nav-item"><a class="nav-link" href="#products">Produits</a></li>
                         <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
-                        <li class="nav-item">
-                            <a class="btn btn-brand position-relative" href="{{ route('cart.index') }}">
-                                Mon panier
-                                @if ($cartCount > 0)
-                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-brand">
-                                        {{ $cartCount }}
-                                    </span>
-                                @endif
-                            </a>
-                        </li>
+                        {{-- Icône panier supprimée du header --}}
                     </ul>
                 </div>
             </div>
@@ -74,9 +63,46 @@
                         <p class="text-muted mb-0">Parcourez la liste de nos produits, trouvez rapidement ce qui vous plait et passez votre commande.</p>
                     </div>
                 </div>
+                <div id="toast-container" style="position: fixed; z-index: 9999; bottom: 2rem; right: 2rem; min-width: 250px;"></div>
                 @if (session('status'))
-                    <div class="alert alert-success">{{ session('status') }}</div>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', function () {
+                            showToast("{{ session('status') }}", 'success');
+                        });
+                    </script>
                 @endif
+                @if ($errors->has('order'))
+                    <script>
+                        window.addEventListener('DOMContentLoaded', function () {
+                            showToast("{{ $errors->first('order') }}", 'danger');
+                        });
+                    </script>
+                @endif
+                        <script>
+                        function showToast(message, type = 'success') {
+                            var container = document.getElementById('toast-container');
+                            if (!container) return;
+                            var toast = document.createElement('div');
+                            toast.className = 'toast align-items-center text-bg-' + type + ' border-0 show';
+                            toast.style.minWidth = '250px';
+                            toast.style.marginBottom = '0.5rem';
+                            toast.innerHTML = `
+                                <div class="d-flex">
+                                    <div class="toast-body">${message}</div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fermer"></button>
+                                </div>
+                            `;
+                            container.appendChild(toast);
+                            setTimeout(function () {
+                                toast.classList.remove('show');
+                                toast.classList.add('hide');
+                                setTimeout(function () { toast.remove(); }, 500);
+                            }, 4000);
+                            toast.querySelector('.btn-close').onclick = function () {
+                                toast.remove();
+                            };
+                        }
+                        </script>
                 <div class="row g-3">
                     @forelse ($products as $product)
                         @php
@@ -95,7 +121,7 @@
                                     <p class="text-muted small product-desc mb-2">{{ strip_tags($product->description_html ?? '') }}</p>
                                     <div class="d-flex align-items-center justify-content-between product-actions">
                                         <span class="fw-bold">{{ number_format($product->price_sell, 0, ',', ' ') }} FCFA</span>
-                                        <button class="btn btn-brand btn-cart" type="button" data-bs-toggle="modal" data-bs-target="#orderModal" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" aria-label="Ajouter au panier">
+                                        <button class="btn btn-brand btn-cart" type="button" data-bs-toggle="modal" data-bs-target="#orderModal" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" aria-label="Commander">
                                             <i class="bi bi-cart"></i>
                                         </button>
                                     </div>
@@ -107,6 +133,9 @@
                             <div class="alert alert-light">Aucun produit pour le moment.</div>
                         </div>
                     @endforelse
+                </div>
+                <div class="mt-4">
+                    {{ $products->links() }}
                 </div>
             </div>
         </section>
@@ -147,23 +176,59 @@
         <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <form method="POST" action="{{ route('cart.add') }}">
+                    <form method="POST" action="{{ route('order.modal.store') }}">
                         @csrf
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="orderModalLabel">Ajouter au panier</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                        <div class="modal-header bg-brand text-white rounded-top-3">
+                            <h5 class="modal-title d-flex align-items-center gap-2" id="orderModalLabel">
+                                <i class="bi bi-cart-check"></i>
+                                Commander
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
                         </div>
-                        <div class="modal-body">
-                            <input type="hidden" name="product_id" id="orderProductId">
-                            <p class="fw-semibold mb-3" id="orderProductName"></p>
-                            <div class="mb-3">
-                                <label class="form-label" for="orderQuantity">Quantite</label>
-                                <input id="orderQuantity" name="quantity" type="number" min="1" max="99" value="1" class="form-control" required>
+                        <div class="modal-body px-4 py-3">
+                            <div class="row g-3">
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label" for="clientName">Nom complet</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                        <input id="clientName" name="client_name" type="text" class="form-control" required value="{{ old('client_name', session('order_client_name')) }}">
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label class="form-label" for="clientContact">Contact</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                        <input id="clientContact" name="client_contact" type="text" class="form-control" required value="{{ old('client_contact', session('order_client_contact')) }}">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label" for="clientAddress">Adresse</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                        <input id="clientAddress" name="client_address" type="text" class="form-control" value="{{ old('client_address', session('order_client_address')) }}">
+                                    </div>
+                                </div>
+                                <input type="hidden" name="product_id" id="orderProductId">
+                                <div class="col-12">
+                                    <label class="form-label" for="orderQuantity">Quantité</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-123"></i></span>
+                                        <input id="orderQuantity" name="quantity" type="number" min="1" max="99" value="1" class="form-control" required>
+                                    </div>
+                                </div>
+                                <!-- commentaires optionnels -->
+                                <div class="col-12">
+                                    <label class="form-label" for="clientComment">Commentaires </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-chat-dots"></i></span>
+                                        <textarea id="clientComment" name="client_comment" class="form-control" rows="3" placeholder="Un commentaire (optionnel)"></textarea>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <button type="submit" class="btn btn-brand">Ajouter</button>
+                        <div class="modal-footer bg-light rounded-bottom-3">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x"></i> Annuler</button>
+                            <button type="submit" class="btn btn-brand"><i class="bi bi-check2-circle"></i> Valider</button>
                         </div>
                     </form>
                 </div>
@@ -203,17 +268,15 @@
             </div>
         </footer>
         <script>
+            // Prefill modal fields from session handled by backend, plus gestion du product_id
             (function () {
                 var modal = document.getElementById('orderModal');
-                if (!modal) {
-                    return;
-                }
+                if (!modal) return;
                 modal.addEventListener('show.bs.modal', function (event) {
                     var button = event.relatedTarget;
-                    var productId = button.getAttribute('data-product-id');
-                    var productName = button.getAttribute('data-product-name');
-                    document.getElementById('orderProductId').value = productId;
-                    document.getElementById('orderProductName').textContent = productName;
+                    if (button && button.hasAttribute('data-product-id')) {
+                        document.getElementById('orderProductId').value = button.getAttribute('data-product-id');
+                    }
                     document.getElementById('orderQuantity').value = 1;
                 });
             })();

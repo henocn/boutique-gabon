@@ -9,6 +9,38 @@
         <div class="alert alert-success">{{ session('status') }}</div>
     @endif
 
+    <ul class="nav nav-pills gap-2 flex-wrap mb-3">
+        <li class="nav-item">
+            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'active' ? 'active bg-transparent border border-2 border-warning text-warning' : 'bg-white border text-muted' }}"
+                href="{{ route('admin.orders.index', ['tab' => 'active']) }}">
+                <span class="fw-semibold">Actives</span>
+                <span class="badge rounded-pill text-bg-danger">{{ $counts['new'] ?? 0 }} Nouv.</span>
+                <span class="badge rounded-pill text-bg-success">{{ $counts['processed'] ?? 0 }} Traitees</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'unreachable' ? 'active bg-transparent border border-2 border-warning text-warning' : 'bg-white border text-muted' }}"
+                href="{{ route('admin.orders.index', ['tab' => 'unreachable']) }}">
+                <span class="fw-semibold">Injoignables</span>
+                <span class="badge rounded-pill text-bg-secondary">{{ $counts['unreachable'] ?? 0 }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'delivered' ? 'active bg-transparent border border-2 border-warning text-warning' : 'bg-white border text-muted' }}"
+                href="{{ route('admin.orders.index', ['tab' => 'delivered']) }}">
+                <span class="fw-semibold">Livrees</span>
+                <span class="badge rounded-pill text-bg-secondary">{{ $counts['delivered'] ?? 0 }}</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link d-flex align-items-center gap-2 px-3 py-2 rounded-pill {{ $tab === 'other' ? 'active bg-transparent border border-2 border-warning text-warning' : 'bg-white border text-muted' }}"
+                href="{{ route('admin.orders.index', ['tab' => 'other']) }}">
+                <span class="fw-semibold">Autres</span>
+                <span class="badge rounded-pill text-bg-secondary">{{ $counts['other'] ?? 0 }}</span>
+            </a>
+        </li>
+    </ul>
+
     <div class="card card-soft p-3">
         <div class="table-responsive">
             <table class="table align-middle mb-0">
@@ -17,18 +49,16 @@
                         <th>#</th>
                         <th>Client</th>
                         <th>Produit</th>
+                        <th>Prix vente</th>
                         <th>Qt</th>
-                        @if (Auth::user()->isAdmin())
-                            <th>Manager</th>
-                        @endif
-                        <th>Statut</th>
+                        <th>Commentaire</th>
                         <th>Date</th>
                         <th class="text-end">Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse ($orders as $order)
-                        <tr>
+                        <tr @class(['table-success' => $order->status === \App\Enums\OrderStatus::Processed])>
                             <td>{{ $order->id }}</td>
                             <td>
                                 <div class="fw-semibold">{{ $order->client_name }}</div>
@@ -38,14 +68,22 @@
                                 <div class="fw-semibold">{{ $order->product?->name }}</div>
                                 <div class="text-muted small">{{ $order->product?->category?->name }}</div>
                             </td>
-                            <td>{{ $order->quantity ?? 1 }}</td>
-                            @if (Auth::user()->isAdmin())
-                                <td>{{ $order->product?->manager?->name }}</td>
-                            @endif
                             <td>
-                                <span class="badge text-bg-secondary">{{ ucfirst(str_replace('_', ' ', $order->status->value)) }}</span>
+                                @if ($order->product?->price_sell !== null)
+                                    {{ number_format($order->product?->price_sell, 0, ',', ' ') }} FCFA
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
                             </td>
-                            <td>{{ $order->created_at?->format('d/m/Y') }}</td>
+                            <td>{{ $order->quantity ?? 1 }}</td>
+                            <td>
+                                @if ($order->client_comment)
+                                    <span class="text-muted small">{{ $order->client_comment }}</span>
+                                @else
+                                    <span class="text-muted small">-</span>
+                                @endif
+                            </td>
+                            <td>{{ $order->created_at?->format('d/m/Y à H:i') }}</td>
                             <td class="text-end">
                                 <form class="d-inline-flex gap-2" method="POST" action="{{ route('admin.orders.update', $order) }}">
                                     @csrf

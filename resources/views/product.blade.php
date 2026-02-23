@@ -16,15 +16,7 @@
             <div class="container">
                 <a class="navbar-brand fw-bold" href="/">{{ config('app.shop_name', config('app.name')) }}</a>
                 <div class="d-flex align-items-center gap-2 ms-auto">
-                    <a class="btn btn-outline-secondary" href="/">Retour</a>
-                    <a class="btn btn-brand position-relative" href="{{ route('cart.index') }}">
-                        Mon panier
-                        @php($cartCount = array_sum(session('cart', [])))
-                        @if ($cartCount > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-brand">
-                                {{ $cartCount }}
-                            </span>
-                        @endif
+                    {{-- Panier UI supprimé --}}
                     </a>
                 </div>
             </div>
@@ -86,15 +78,7 @@
                                     <i class="bi bi-shield-check"></i>
                                     Paiement a la livraison
                                 </div>
-                            </div>
-                            <form class="d-flex align-items-center gap-2" method="POST" action="{{ route('cart.add') }}">
-                                @csrf
-                                <input type="hidden" name="product_id" value="{{ $product->id }}">
-                                <input class="form-control" type="number" name="quantity" min="1" max="99" value="1" style="width: 120px;" required>
-                                <button class="btn btn-brand" type="submit">
-                                    <i class="bi bi-cart"></i>
-                                    Ajouter au panier
-                                </button>
+                            {{-- Ajout panier supprimé --}}
                             </form>
                         </div>
                     </div>
