@@ -63,9 +63,46 @@
                         <p class="text-muted mb-0">Parcourez la liste de nos produits, trouvez rapidement ce qui vous plait et passez votre commande.</p>
                     </div>
                 </div>
+                <div id="toast-container" style="position: fixed; z-index: 9999; bottom: 2rem; right: 2rem; min-width: 250px;"></div>
                 @if (session('status'))
-                    <div class="alert alert-success">{{ session('status') }}</div>
+                    <script>
+                        window.addEventListener('DOMContentLoaded', function () {
+                            showToast("{{ session('status') }}", 'success');
+                        });
+                    </script>
                 @endif
+                @if ($errors->has('order'))
+                    <script>
+                        window.addEventListener('DOMContentLoaded', function () {
+                            showToast("{{ $errors->first('order') }}", 'danger');
+                        });
+                    </script>
+                @endif
+                        <script>
+                        function showToast(message, type = 'success') {
+                            var container = document.getElementById('toast-container');
+                            if (!container) return;
+                            var toast = document.createElement('div');
+                            toast.className = 'toast align-items-center text-bg-' + type + ' border-0 show';
+                            toast.style.minWidth = '250px';
+                            toast.style.marginBottom = '0.5rem';
+                            toast.innerHTML = `
+                                <div class="d-flex">
+                                    <div class="toast-body">${message}</div>
+                                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fermer"></button>
+                                </div>
+                            `;
+                            container.appendChild(toast);
+                            setTimeout(function () {
+                                toast.classList.remove('show');
+                                toast.classList.add('hide');
+                                setTimeout(function () { toast.remove(); }, 500);
+                            }, 4000);
+                            toast.querySelector('.btn-close').onclick = function () {
+                                toast.remove();
+                            };
+                        }
+                        </script>
                 <div class="row g-3">
                     @forelse ($products as $product)
                         @php
@@ -159,6 +196,7 @@
                                 <label class="form-label" for="clientAddress">Adresse</label>
                                 <input id="clientAddress" name="client_address" type="text" class="form-control" value="{{ old('client_address', $orderClient['client_address'] ?? '') }}">
                             </div>
+                            <input type="hidden" name="product_id" id="orderProductId">
                             <div class="mb-3">
                                 <label class="form-label" for="orderQuantity">Quantité</label>
                                 <input id="orderQuantity" name="quantity" type="number" min="1" max="99" value="1" class="form-control" required>
@@ -214,7 +252,7 @@
                 modal.addEventListener('show.bs.modal', function (event) {
                     var button = event.relatedTarget;
                     if (button && button.hasAttribute('data-product-id')) {
-                        // Optionally, set product info in modal if needed
+                        document.getElementById('orderProductId').value = button.getAttribute('data-product-id');
                     }
                     document.getElementById('orderQuantity').value = 1;
                 });
