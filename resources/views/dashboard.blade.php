@@ -9,7 +9,7 @@
     <div class="row g-3">
         <!-- Card 1: Commandes -->
         <div class="col-md-3">
-            <div class="card card-soft p-3 h-100 border border-2 border-warning-subtle" style="min-height: 210px;">
+            <div class="card card-soft p-3 h-100 border-2 border-warning-subtle" style="min-height: 210px;">
                 <p class="fw-semibold mb-2">Commandes</p>
                 <div class="d-flex flex-column gap-0">
                     <span class="small text-muted py-1">Total : <span class="fw-bold">{{ $totalOrders }}</span></span>
@@ -21,7 +21,7 @@
         </div>
         <!-- Card 2: Produits & Catégories -->
         <div class="col-md-3">
-            <div class="card card-soft p-3 h-100 border border-2 border-warning-subtle" style="min-height: 210px;">
+            <div class="card card-soft p-3 h-100 border-2 border-warning-subtle" style="min-height: 210px;">
                 <p class="fw-semibold mb-2">Produits & Catégories</p>
                 <div class="d-flex flex-column gap-0">
                     <span class="small text-muted py-1">Produits actifs : <span class="fw-bold">{{ $activeProducts ?? 0 }}</span></span>
@@ -33,7 +33,7 @@
         </div>
         <!-- Card 3: Économie -->
         <div class="col-md-3">
-            <div class="card card-soft p-3 h-100 border border-2 border-warning-subtle" style="min-height: 210px;">
+            <div class="card card-soft p-3 h-100 border-2 border-warning-subtle" style="min-height: 210px;">
                 <p class="fw-semibold mb-2">Économie</p>
                 <div class="d-flex flex-column gap-0">
                     <span class="small text-muted py-1">Chiffre d'affaires : <span class="fw-bold">{{ number_format($deliveredRevenue, 0, ',', ' ') }} FCFA</span></span>
@@ -43,7 +43,7 @@
         </div>
         <!-- Card 4: Utilisateurs -->
         <div class="col-md-3">
-            <div class="card card-soft p-3 h-100 border border-2 border-warning-subtle" style="min-height: 210px;">
+            <div class="card card-soft p-3 h-100 border-2 border-warning-subtle" style="min-height: 210px;">
                 <p class="fw-semibold mb-2">Utilisateurs</p>
                 <div class="d-flex flex-column gap-0">
                     <span class="small text-muted py-1">Total : <span class="fw-bold">{{ $totalUsers ?? 0 }}</span></span>
@@ -58,7 +58,7 @@
     @if ($isAdmin)
     <div class="row g-3 mt-1">
         <div class="col-lg-6">
-            <div class="card card-soft p-3 h-100 border border-2 border-warning-subtle">
+            <div class="card card-soft p-3 h-100 border-2 border-warning-subtle">
                 <p class="fw-semibold mb-3">Top 5 produits les plus vendus</p>
                 <div class="d-grid gap-2">
                     @forelse ($topSold as $item)
@@ -112,7 +112,7 @@
     </div>
     <div class="row g-3 mt-1">
         <div class="col-lg-12">
-            <div class="card card-soft p-3 h-100 border border-2 border-warning-subtle">
+            <div class="card card-soft p-3 h-100  border-2 border-warning-subtle">
                 <p class="fw-semibold mb-3">Top vendeurs (assistantes/managers)</p>
                 <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
