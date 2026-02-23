@@ -209,11 +209,19 @@
                                     </div>
                                 </div>
                                 <input type="hidden" name="product_id" id="orderProductId">
-                                <div class="col-12 col-md-6">
+                                <div class="col-12">
                                     <label class="form-label" for="orderQuantity">Quantité</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-123"></i></span>
                                         <input id="orderQuantity" name="quantity" type="number" min="1" max="99" value="1" class="form-control" required>
+                                    </div>
+                                </div>
+                                <!-- commentaires optionnels -->
+                                <div class="col-12">
+                                    <label class="form-label" for="clientComment">Commentaires </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="bi bi-chat-dots"></i></span>
+                                        <textarea id="clientComment" name="client_comment" class="form-control" rows="3" placeholder="Un commentaire (optionnel)"></textarea>
                                     </div>
                                 </div>
                             </div>
