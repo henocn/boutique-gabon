@@ -79,7 +79,7 @@
                             <td>
                                 <span class="badge text-bg-secondary">{{ ucfirst(str_replace('_', ' ', $order->status->value)) }}</span>
                             </td>
-                            <td>{{ $order->created_at?->format('d/m/Y') }}</td>
+                            <td>{{ $order->created_at?->format('d/m/Y à H:i') }}</td>
                             <td class="text-end">
                                 <form class="d-inline-flex gap-2" method="POST" action="{{ route('admin.orders.update', $order) }}">
                                     @csrf
