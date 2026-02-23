@@ -63,9 +63,17 @@
                 <div class="d-grid gap-2">
                     @forelse ($topSold as $item)
                         <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <div class="fw-semibold">{{ $item->product?->name }}</div>
-                                <div class="text-muted small">{{ $item->product?->category?->name }}</div>
+                            <div class="d-flex align-items-center gap-2">
+                                @php($thumb = $item->product?->productImages?->first())
+                                @if ($thumb)
+                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($thumb->path) }}" alt="{{ $item->product?->name }}" width="38" height="38" class="rounded border">
+                                @else
+                                    <div class="bg-light border rounded" style="width: 38px; height: 38px;"></div>
+                                @endif
+                                <div>
+                                    <div class="fw-semibold">{{ $item->product?->name }}</div>
+                                    <div class="text-muted small">{{ $item->product?->category?->name }}</div>
+                                </div>
                             </div>
                             <span class="badge text-bg-secondary">{{ $item->sold_count }} ventes</span>
                         </div>
@@ -81,9 +89,17 @@
                 <div class="d-grid gap-2">
                     @forelse ($topRevenue as $item)
                         <div class="d-flex align-items-center justify-content-between">
-                            <div>
-                                <div class="fw-semibold">{{ $item['product']?->name }}</div>
-                                <div class="text-muted small">{{ $item['product']?->category?->name }}</div>
+                            <div class="d-flex align-items-center gap-2">
+                                @php($thumb = $item['product']?->productImages?->first())
+                                @if ($thumb)
+                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($thumb->path) }}" alt="{{ $item['product']?->name }}" width="38" height="38" class="rounded border">
+                                @else
+                                    <div class="bg-light border rounded" style="width: 38px; height: 38px;"></div>
+                                @endif
+                                <div>
+                                    <div class="fw-semibold">{{ $item['product']?->name }}</div>
+                                    <div class="text-muted small">{{ $item['product']?->category?->name }}</div>
+                                </div>
                             </div>
                             <span class="badge text-bg-success">{{ number_format($item['revenue'], 0, ',', ' ') }} FCFA</span>
                         </div>
@@ -134,6 +150,4 @@
         </div>
     </div>
     @endif
-    <!-- Section Produits récents supprimée -->
-    </div>
 </x-app-layout>
