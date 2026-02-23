@@ -51,7 +51,7 @@
                         <th>Produit</th>
                         <th>Prix vente</th>
                         <th>Qt</th>
-                        <th>Statut</th>
+                        <th>Commentaire</th>
                         <th>Date</th>
                         <th class="text-end">Action</th>
                     </tr>
@@ -77,7 +77,11 @@
                             </td>
                             <td>{{ $order->quantity ?? 1 }}</td>
                             <td>
-                                <span class="badge text-bg-secondary">{{ ucfirst(str_replace('_', ' ', $order->status->value)) }}</span>
+                                @if ($order->client_comment)
+                                    <span class="text-muted small">{{ $order->client_comment }}</span>
+                                @else
+                                    <span class="text-muted small">-</span>
+                                @endif
                             </td>
                             <td>{{ $order->created_at?->format('d/m/Y à H:i') }}</td>
                             <td class="text-end">
