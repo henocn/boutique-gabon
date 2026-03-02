@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Enums\Country;
 use App\Enums\ProductStatus;
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -39,26 +39,27 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        if (Category::query()->count() === 0) {
-            $categories = collect([
-                ['name' => 'Electronique', 'description' => 'Accessoires et gadgets'],
-                ['name' => 'Maison', 'description' => 'Cuisine et rangement'],
-                ['name' => 'Mode', 'description' => 'Style et accessoires'],
-            ])->map(function (array $data) {
-                return Category::create($data + ['is_active' => true]);
-            });
+        // Create sample products if none exist
+        if (Product::query()->count() === 0) {
+            $countries = [
+                [Country::Togo->value],
+                [Country::Congo->value],
+                [Country::CentralAfrica->value],
+                [Country::Togo->value, Country::Congo->value],
+                [Country::Togo->value, Country::Congo->value, Country::CentralAfrica->value],
+            ];
 
-            foreach ($categories as $index => $category) {
+            foreach (range(1, 5) as $index) {
                 Product::create([
-                    'name' => 'Produit demo '.($index + 1),
+                    'name' => 'Produit demo ' . $index,
                     'description_html' => 'Produit de demonstration',
                     'price_buy' => 5000,
                     'price_sell' => 12000 + ($index * 1500),
                     'price_shipping' => 1000,
-                    'category_id' => $category->id,
                     'manager_id' => $manager->id,
                     'stock' => 10,
                     'status' => ProductStatus::Active,
+                    'countries' => $countries[$index - 1],
                 ]);
             }
         }

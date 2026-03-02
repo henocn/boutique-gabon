@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('manager')->index()->after('email');
-            $table->boolean('is_active')->default(true)->after('role');
+            // Vérifier si les colonnes n'existent pas déjà
+            if (!Schema::hasColumn('users', 'role')) {
+                $table->string('role')->default('manager')->index()->after('email');
+            }
+            if (!Schema::hasColumn('users', 'is_active')) {
+                $table->boolean('is_active')->default(true)->after('role');
+            }
         });
     }
 

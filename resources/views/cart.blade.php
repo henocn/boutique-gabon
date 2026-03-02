@@ -60,7 +60,7 @@
                                     @endif
                                     <div class="flex-grow-1">
                                         <div class="fw-semibold">{{ $item['product']->name }}</div>
-                                        <div class="text-muted small">{{ $item['product']->category?->name }}</div>
+                                        <div class="text-muted small">{{ $item['product']->name }}</div>
                                         <div class="fw-semibold">{{ number_format($item['product']->price_sell, 0, ',', ' ') }} FCFA</div>
                                     </div>
                                     <form class="d-flex align-items-center gap-2" method="POST" action="{{ route('cart.update', $item['product']) }}">

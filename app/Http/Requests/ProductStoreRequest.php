@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\Country;
 use App\Enums\ProductStatus;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -21,10 +22,11 @@ class ProductStoreRequest extends FormRequest
             'price_buy' => ['required', 'integer', 'min:0'],
             'price_sell' => ['required', 'integer', 'min:0'],
             'price_shipping' => ['required', 'integer', 'min:0'],
-            'category_id' => ['required', 'exists:categories,id'],
             'manager_id' => ['required', 'exists:users,id'],
             'stock' => ['required', 'integer', 'min:0'],
             'status' => ['required', Rule::in(array_map(fn (ProductStatus $s) => $s->value, ProductStatus::cases()))],
+            'countries' => ['required', 'array', 'min:1'],
+            'countries.*' => ['string', Rule::in(array_map(fn (Country $c) => $c->value, Country::cases()))],
             'images' => ['nullable', 'array', 'max:5'],
             'images.*' => ['file', 'mimes:jpg,jpeg,png,webp,gif,jfif', 'max:2048'],
         ];

@@ -1,285 +1,544 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="fr">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ config('app.shop_name', config('app.name')) }}</title>
+        <title>{{ $product->name }} - {{ config('app.shop_name', config('app.name')) }}</title>
+        <meta property="og:title" content="{{ $product->name }}" />
+        <meta property="og:description" content="{{ \Illuminate\Support\Str::limit(strip_tags($product->description_html ?? ''), 150) }}" />
+        @if ($product->productImages->first())
+            <meta property="og:image" content="{{ \Illuminate\Support\Facades\Storage::url($product->productImages->first()->path) }}" />
+        @endif
+        <meta property="og:type" content="product" />
+        <meta property="og:site_name" content="{{ config('app.shop_name') }}" />
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700" rel="stylesheet" />
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <script src="{{ asset('js/tracking-manager.js') }}"></script>
+        <script src="{{ asset('js/order-tracking.js') }}"></script>
+
+        <style>
+            :root {
+                --primary-color: rgb(56, 89, 161);
+                --secondary-color: #33696e;
+                --neutral-color: #16191b;
+                --neutral-light-color: #e3e3e3;
+            }
+
+            body {
+                font-family: 'Manrope', sans-serif;
+                color: var(--neutral-color);
+                background-color: #f7f7f7;
+            }
+
+            .header {
+                background-color: #fff;
+                border-bottom: 1px solid var(--primary-color);
+                padding: 15px 0;
+                position: sticky;
+                top: 0;
+                z-index: 100;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                margin-bottom: 30px;
+            }
+
+            .navbar {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 20px;
+            }
+
+            .logo {
+                max-width: 140px;
+            }
+
+            .logo img {
+                width: 100%;
+                height: auto;
+            }
+
+            /* PRODUCT LAYOUT */
+            .product-layout {
+                display: flex;
+                gap: 40px;
+                background: #fff;
+                border-radius: 8px;
+                padding: 30px;
+                margin-bottom: 30px;
+            }
+
+            .product-images {
+                flex: 1;
+                min-width: 300px;
+            }
+
+            .main-image-wrapper {
+                width: 100%;
+                aspect-ratio: 1 / 1;
+                background: #f0f0f0;
+                border-radius: 8px;
+                overflow: hidden;
+                margin-bottom: 20px;
+            }
+
+            .main-image-wrapper img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transition: transform 0.3s ease;
+            }
+
+            .main-image-wrapper:hover img {
+                transform: scale(1.05);
+            }
+
+            .carousel-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+                gap: 10px;
+            }
+
+            .carousel-item {
+                cursor: pointer;
+                border-radius: 4px;
+                overflow: hidden;
+                border: 2px solid transparent;
+                transition: border-color 0.2s;
+            }
+
+            .carousel-item:hover {
+                border-color: var(--primary-color);
+            }
+
+            .carousel-item img {
+                width: 100%;
+                aspect-ratio: 1 / 1;
+                object-fit: cover;
+            }
+
+            .product-details {
+                flex: 1;
+                min-width: 300px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .product-name {
+                font-size: 28px;
+                color: var(--neutral-color);
+                margin-bottom: 15px;
+            }
+
+            .product-price {
+                font-size: 32px;
+                color: var(--primary-color);
+                font-weight: bold;
+                margin-bottom: 25px;
+            }
+
+            .express-checkout-form {
+                border: 1px solid #e9ecef;
+                border-radius: 8px;
+                padding: 20px;
+                background: #fafafa;
+            }
+
+            .express-checkout-fields {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                margin-bottom: 15px;
+            }
+
+            .form-control-custom {
+                width: 100%;
+                padding: 10px 12px;
+                border: 1px solid var(--neutral-light-color);
+                border-radius: 4px;
+                font-size: 14px;
+                font-family: 'Manrope', sans-serif;
+            }
+
+            .form-control-custom:focus {
+                outline: none;
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(56, 89, 161, 0.1);
+            }
+
+            .phone-input-wrapper {
+                display: flex;
+                gap: 10px;
+            }
+
+            .form-control-country {
+                padding: 10px 12px;
+                border: 1px solid var(--neutral-light-color);
+                border-radius: 4px;
+                font-size: 14px;
+                font-family: 'Manrope', sans-serif;
+                flex-shrink: 0;
+            }
+
+            .form-control-country:focus {
+                outline: none;
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 3px rgba(56, 89, 161, 0.1);
+            }
+
+            .phone-input-wrapper input {
+                flex: 1;
+            }
+
+            .modal-footer-custom {
+                padding-top: 15px;
+                border-top: 1px solid #e9ecef;
+            }
+
+            .btn-submit-order {
+                width: 100%;
+                background-color: var(--primary-color);
+                color: #fff;
+                border: none;
+                padding: 12px;
+                font-size: 16px;
+                font-weight: 600;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .btn-submit-order:hover {
+                background-color: var(--secondary-color);
+            }
+
+            .btn-submit-order:disabled {
+                background-color: #ccc;
+                cursor: not-allowed;
+            }
+
+            .product-description {
+                background: #fff;
+                border-radius: 8px;
+                padding: 30px;
+                margin-bottom: 30px;
+            }
+
+            .product-description h1,
+            .product-description h2,
+            .product-description h3 {
+                color: var(--neutral-color);
+                margin-top: 20px;
+                margin-bottom: 15px;
+            }
+
+            .product-description a {
+                color: var(--primary-color);
+                text-decoration: none;
+            }
+
+            .product-description a:hover {
+                text-decoration: underline;
+            }
+
+            .product-description img {
+                max-width: 100%;
+                height: auto;
+                border-radius: 4px;
+                margin: 15px 0;
+            }
+
+            /* FOOTER */
+            footer {
+                background-color: var(--primary-color);
+                color: #fff;
+                padding: 40px 0 10px;
+                margin-top: 60px;
+            }
+
+            footer .columns {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 30px;
+                margin-bottom: 20px;
+            }
+
+            footer .column img {
+                max-width: 110px;
+                height: auto;
+            }
+
+            footer .column h1 {
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+
+            footer .column a, footer .column h5 {
+                font-size: 14px;
+                opacity: 0.9;
+                text-decoration: none;
+                color: #fff;
+                display: block;
+                margin-bottom: 8px;
+            }
+
+            footer .column a:hover {
+                opacity: 1;
+                text-decoration: underline;
+            }
+
+            footer .copyright-wrapper {
+                text-align: center;
+                padding-top: 20px;
+                border-top: 1px solid rgba(255,255,255,0.2);
+                font-size: 13px;
+            }
+
+            /* TOAST */
+            .toast-container {
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                z-index: 9999;
+            }
+
+            /* RESPONSIVE */
+            @media (max-width: 768px) {
+                .product-layout {
+                    flex-direction: column;
+                    padding: 20px;
+                    gap: 20px;
+                }
+
+                .carousel-grid {
+                    grid-template-columns: repeat(4, 1fr);
+                }
+
+                .product-name {
+                    font-size: 22px;
+                }
+
+                .product-price {
+                    font-size: 24px;
+                }
+            }
+        </style>
     </head>
     <body>
-        {{-- Panier logic supprimé --}}
-        <nav class="navbar navbar-expand-lg bg-white border-bottom navbar-client fixed-top">
-            <div class="container">
-                <a class="navbar-brand fw-bold" href="/">{{ config('app.shop_name', config('app.name')) }}</a>
-                <button class="btn btn-sm btn-brand d-lg-none me-2" type="button" data-bs-toggle="modal" data-bs-target="#searchModal" aria-label="Rechercher">
-                    <i class="bi bi-search"></i>
-                </button>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="mainNav">
-                    <form class="d-none d-lg-flex align-items-center gap-2 ms-lg-4 me-lg-auto" method="GET" action="/">
-                        <input class="form-control form-control-sm navbar-search" type="search" name="q" value="{{ $search }}" placeholder="Rechercher un produit">
-                        @if ($selectedCategory)
-                            <input type="hidden" name="category" value="{{ $selectedCategory }}">
-                        @endif
-                        <button class="btn btn-sm btn-brand" type="submit" aria-label="Rechercher">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </form>
-                    <ul class="navbar-nav align-items-lg-center gap-lg-3">
-                        <li class="nav-item"><a class="nav-link" href="#products">Produits</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#categories">Categories</a></li>
-                        {{-- Icône panier supprimée du header --}}
-                    </ul>
+        <!-- HEADER -->
+        <header class="header">
+            <nav class="navbar container-lg">
+                <div class="logo">
+                    <a href="/" aria-label="Accueil">
+                        <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.shop_name') }}">
+                    </a>
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </header>
 
-        <section id="products" class="py-5 bg-white">
-            <div class="container">
-                <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-3">
-                    <h2 class="h3 fw-bold mb-1">Produits</h2>
-                    <form class="d-flex align-items-center gap-2 flex-nowrap filter-row" method="GET" action="/">
-                        @if ($search)
-                            <input type="hidden" name="q" value="{{ $search }}">
+        <!-- MAIN CONTENT -->
+        <main class="container-lg">
+            <div id="toast-container" class="toast-container"></div>
+
+            <section class="product-layout" id="product_details">
+                <!-- IMAGES -->
+                <div class="product-images">
+                    <div class="main-image-wrapper">
+                        @php($firstImage = $product->productImages->first())
+                        @if ($firstImage)
+                            <img id="main-image" src="{{ \Illuminate\Support\Facades\Storage::url($firstImage->path) }}" alt="{{ $product->name }}">
+                        @else
+                            <div style="display: flex; align-items: center; justify-content: center; height: 100%; background: #e9ecef; color: #999;">
+                                Pas d'image
+                            </div>
                         @endif
-                        <select class="form-select" name="category">
-                            <option value="">Toutes categories</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}" @selected((string) $selectedCategory === (string) $category->id)>
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        <button class="btn btn-brand" type="submit">Filtrer</button>
-                    </form>
-                    <div>
-                        <p class="text-muted mb-0">Parcourez la liste de nos produits, trouvez rapidement ce qui vous plait et passez votre commande.</p>
                     </div>
-                </div>
-                <div id="toast-container" style="position: fixed; z-index: 9999; bottom: 2rem; right: 2rem; min-width: 250px;"></div>
-                @if (session('status'))
-                    <script>
-                        window.addEventListener('DOMContentLoaded', function () {
-                            showToast("{{ session('status') }}", 'success');
-                        });
-                    </script>
-                @endif
-                @if ($errors->has('order'))
-                    <script>
-                        window.addEventListener('DOMContentLoaded', function () {
-                            showToast("{{ $errors->first('order') }}", 'danger');
-                        });
-                    </script>
-                @endif
-                        <script>
-                        function showToast(message, type = 'success') {
-                            var container = document.getElementById('toast-container');
-                            if (!container) return;
-                            var toast = document.createElement('div');
-                            toast.className = 'toast align-items-center text-bg-' + type + ' border-0 show';
-                            toast.style.minWidth = '250px';
-                            toast.style.marginBottom = '0.5rem';
-                            toast.innerHTML = `
-                                <div class="d-flex">
-                                    <div class="toast-body">${message}</div>
-                                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fermer"></button>
-                                </div>
-                            `;
-                            container.appendChild(toast);
-                            setTimeout(function () {
-                                toast.classList.remove('show');
-                                toast.classList.add('hide');
-                                setTimeout(function () { toast.remove(); }, 500);
-                            }, 4000);
-                            toast.querySelector('.btn-close').onclick = function () {
-                                toast.remove();
-                            };
-                        }
-                        </script>
-                <div class="row g-3">
-                    @forelse ($products as $product)
-                        @php
-                            $firstImage = $product->productImages->first();
-                        @endphp
-                        <div class="col-12 col-md-6 col-lg-4 col-xl-3">
-                            <div class="card product-card h-100">
-                                <div class="ratio ratio-4x3 bg-light overflow-hidden">
-                                    @if ($firstImage)
-                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($firstImage->path) }}" alt="{{ $product->name }}" class="w-100 h-100 object-fit-cover">
-                                    @endif
-                                </div>
-                                <div class="product-body">
-                                    <a class="stretched-link text-decoration-none text-reset" href="{{ route('products.show', $product) }}"></a>
-                                    <p class="fw-semibold mb-1">{{ $product->name }}</p>
-                                    <p class="text-muted small product-desc mb-2">{{ strip_tags($product->description_html ?? '') }}</p>
-                                    <div class="d-flex align-items-center justify-content-between product-actions">
-                                        <span class="fw-bold">{{ number_format($product->price_sell, 0, ',', ' ') }} FCFA</span>
-                                        <button class="btn btn-brand btn-cart" type="button" data-bs-toggle="modal" data-bs-target="#orderModal" data-product-id="{{ $product->id }}" data-product-name="{{ $product->name }}" aria-label="Commander">
-                                            <i class="bi bi-cart"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    @empty
-                        <div class="col-12">
-                            <div class="alert alert-light">Aucun produit pour le moment.</div>
-                        </div>
-                    @endforelse
-                </div>
-                <div class="mt-4">
-                    {{ $products->links() }}
-                </div>
-            </div>
-        </section>
 
-        <section id="categories" class="py-5">
-            <div class="container">
-                <div class="d-flex align-items-end justify-content-between mb-3">
-                    <h2 class="h3 fw-bold mb-0">Categories</h2>
-                    <a class="text-brand fw-semibold" href="#products">Voir les produits</a>
-                </div>
-                <div class="row g-3">
-                    @forelse ($categories as $category)
-                        @php
-                            $categoryUrl = url('/').'?category='.$category->id.($search ? '&q='.urlencode($search) : '');
-                        @endphp
-                        <div class="col-6 col-lg-3">
-                            <a class="card card-soft p-3 text-decoration-none text-reset" href="{{ $categoryUrl }}">
-                                <div class="ratio ratio-4x3 bg-light rounded-4 overflow-hidden">
-                                    @if ($category->image_path)
-                                        <img src="{{ \Illuminate\Support\Facades\Storage::url($category->image_path) }}" alt="{{ $category->name }}" class="w-100 h-100 object-fit-cover">
-                                    @endif
+                    @if ($product->productImages->count() > 1)
+                        <div class="carousel-grid">
+                            @foreach ($product->productImages as $image)
+                                <div class="carousel-item" onclick="document.getElementById('main-image').src = '{{ \Illuminate\Support\Facades\Storage::url($image->path) }}'">
+                                    <img src="{{ \Illuminate\Support\Facades\Storage::url($image->path) }}" alt="{{ $product->name }}">
                                 </div>
-                                <div class="mt-3">
-                                    <p class="fw-semibold mb-1">{{ $category->name }}</p>
-                                    <p class="text-muted small mb-0">{{ \Illuminate\Support\Str::limit($category->description, 60) }}</p>
-                                </div>
-                            </a>
+                            @endforeach
                         </div>
-                    @empty
-                        <div class="col-12">
-                            <div class="alert alert-light">Aucune categorie pour le moment.</div>
-                        </div>
-                    @endforelse
+                    @endif
                 </div>
-            </div>
-        </section>
 
-        <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <form method="POST" action="{{ route('order.modal.store') }}">
+                <!-- DETAILS + FORM -->
+                <div class="product-details">
+                    <h1 class="product-name">{{ $product->name }}</h1>
+                    <h2 class="product-price">{{ number_format($product->price_sell, 0, ',', ' ') }} XOF</h2>
+
+                    <form class="express-checkout-form" method="POST" action="{{ route('order.modal.store') }}">
                         @csrf
-                        <div class="modal-header bg-brand text-white rounded-top-3">
-                            <h5 class="modal-title d-flex align-items-center gap-2" id="orderModalLabel">
-                                <i class="bi bi-cart-check"></i>
-                                Commander
-                            </h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                        </div>
-                        <div class="modal-body px-4 py-3">
-                            <div class="row g-3">
-                                <div class="col-12 col-md-6">
-                                    <label class="form-label" for="clientName">Nom complet</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-person"></i></span>
-                                        <input id="clientName" name="client_name" type="text" class="form-control" required value="{{ old('client_name', session('order_client_name')) }}">
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-6">
-                                    <label class="form-label" for="clientContact">Contact</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                                        <input id="clientContact" name="client_contact" type="text" class="form-control" required value="{{ old('client_contact', session('order_client_contact')) }}">
-                                    </div>
-                                </div>
-                                <div class="col-12">
-                                    <label class="form-label" for="clientAddress">Adresse</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                                        <input id="clientAddress" name="client_address" type="text" class="form-control" value="{{ old('client_address', session('order_client_address')) }}">
-                                    </div>
-                                </div>
-                                <input type="hidden" name="product_id" id="orderProductId">
-                                <div class="col-12">
-                                    <label class="form-label" for="orderQuantity">Quantité</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-123"></i></span>
-                                        <input id="orderQuantity" name="quantity" type="number" min="1" max="99" value="1" class="form-control" required>
-                                    </div>
-                                </div>
-                                <!-- commentaires optionnels -->
-                                <div class="col-12">
-                                    <label class="form-label" for="clientComment">Commentaires </label>
-                                    <div class="input-group">
-                                        <span class="input-group-text"><i class="bi bi-chat-dots"></i></span>
-                                        <textarea id="clientComment" name="client_comment" class="form-control" rows="3" placeholder="Un commentaire (optionnel)"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="modal-footer bg-light rounded-bottom-3">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal"><i class="bi bi-x"></i> Annuler</button>
-                            <button type="submit" class="btn btn-brand"><i class="bi bi-check2-circle"></i> Valider</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
+                        <div class="express-checkout-fields">
+                            <input type="text" name="client_name" class="form-control-custom" 
+                                   placeholder="Nom complet" required 
+                                   value="{{ session('order_client_name', '') }}">
 
-        <div class="modal fade" id="searchModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <form method="GET" action="/">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Rechercher</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                            <div class="phone-input-wrapper">
+                                <select name="client_country" class="form-control-country" required>
+                                    <option value="">Pays</option>
+                                    @if ($product->countries && count($product->countries) > 0)
+                                        @foreach ($product->countries as $country)
+                                            @if ($countryEnum = \App\Enums\Country::tryFrom($country))
+                                                <option value="{{ $country }}">{{ $countryEnum->flag() }} {{ $countryEnum->label() }}</option>
+                                            @endif
+                                        @endforeach
+                                    @endif
+                                </select>
+                                <input type="tel" name="client_contact" class="form-control-custom" 
+                                       placeholder="Numéro de téléphone" required 
+                                       value="{{ session('order_client_contact', '') }}">
+                            </div>
+
+                            <input type="text" name="client_address" class="form-control-custom" 
+                                   placeholder="Adresse (Ville, Quartier)" 
+                                   value="{{ session('order_client_address', '') }}">
+
+                            <input type="number" name="quantity" class="form-control-custom" 
+                                   min="1" max="99" value="1" placeholder="Quantité" required>
+
+                            <textarea name="client_comment" class="form-control-custom" 
+                                      rows="3" placeholder="Note éventuelle (optionnel)"></textarea>
+
+                            <input type="hidden" name="product_id" value="{{ $product->id }}">
                         </div>
-                        <div class="modal-body">
-                            <input class="form-control" type="search" name="q" value="{{ $search }}" placeholder="Rechercher un produit">
-                            @if ($selectedCategory)
-                                <input type="hidden" name="category" value="{{ $selectedCategory }}">
-                            @endif
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <button type="submit" class="btn btn-brand">
-                                <i class="bi bi-search"></i>
-                                Rechercher
+
+                        <div class="modal-footer-custom">
+                            <button type="submit" class="btn-submit-order">
+                                <i class="bi bi-check-circle"></i>
+                                <span>Valider la commande</span>
                             </button>
                         </div>
                     </form>
+
+                    @if ($product->countries && count($product->countries) > 0)
+                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e9ecef;">
+                            <p style="font-size: 13px; color: #999; margin-bottom: 8px;">Disponible dans :</p>
+                            <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                @foreach ($product->countries as $country)
+                                    <span style="font-size: 12px; padding: 4px 8px; background-color: var(--primary-color); color: #fff; border-radius: 3px;">
+                                        {{ \App\Enums\Country::tryFrom($country)?->label() }}
+                                    </span>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </section>
+
+            <!-- DESCRIPTION -->
+            @if ($product->description_html)
+                <div class="product-description">
+                    {!! $product->description_html !!}
+                </div>
+            @endif
+        </main>
+
+        <!-- FOOTER -->
+        <footer>
+            <div class="columns container-lg">
+                <div class="column logo">
+                    <img src="{{ asset('images/logo.png') }}" alt="{{ config('app.shop_name') }}" width="110" height="70">
+                </div>
+                <div class="column">
+                    <h1>À propos</h1>
+                    <a href="#">À propos de nous</a>
+                    <a href="#">Modes de paiement</a>
+                    <a href="#">Livraison</a>
+                </div>
+                <div class="column">
+                    <h1>Services</h1>
+                    <h5>Nous sommes une boutique en ligne</h5>
+                    <h5>Nous proposons des services d'achat</h5>
+                    <a href="#">Politique de confidentialité</a>
                 </div>
             </div>
-        </div>
-
-        <footer class="py-4 border-top bg-white">
-            <div class="container d-flex flex-wrap justify-content-between align-items-center">
-                <p class="mb-0 text-muted">{{ date('Y') }} {{ config('app.shop_name', config('app.name')) }}. Tous droits reserves.</p>
-                <span class="text-muted">Support: +241 00 00 00 00</span>
+            <div class="copyright-wrapper">
+                <p><strong>&copy; {{ date('Y') }} {{ config('app.shop_name') }} - Tous droits réservés</strong></p>
             </div>
         </footer>
+
         <script>
-            // Prefill modal fields from session handled by backend, plus gestion du product_id
-            (function () {
-                var modal = document.getElementById('orderModal');
-                if (!modal) return;
-                modal.addEventListener('show.bs.modal', function (event) {
-                    var button = event.relatedTarget;
-                    if (button && button.hasAttribute('data-product-id')) {
-                        document.getElementById('orderProductId').value = button.getAttribute('data-product-id');
-                    }
-                    document.getElementById('orderQuantity').value = 1;
+            function showToast(message, type = 'success') {
+                var container = document.getElementById('toast-container');
+                if (!container) return;
+                var toast = document.createElement('div');
+                toast.className = 'toast align-items-center text-bg-' + type + ' border-0 show';
+                toast.style.minWidth = '250px';
+                toast.style.marginBottom = '0.5rem';
+                toast.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">${message}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                `;
+                container.appendChild(toast);
+                setTimeout(function () {
+                    toast.classList.remove('show');
+                    setTimeout(function () { toast.remove(); }, 300);
+                }, 4000);
+            }
+
+            @if (session('status'))
+                window.addEventListener('DOMContentLoaded', function () {
+                    showToast("{{ session('status') }}", 'success');
                 });
-            })();
+            @endif
+
+            @if ($errors->has('order'))
+                window.addEventListener('DOMContentLoaded', function () {
+                    showToast("{{ $errors->first('order') }}", 'danger');
+                });
+            @endif
+
+            // FORM TRACKING
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    if (typeof trackWhenReady === 'function') {
+                        trackWhenReady('QualifiedVisit', {
+                            content_ids: ['{{ $product->id }}'],
+                            content_name: '{{ $product->name }}',
+                            value: {{ $product->price_sell }},
+                            currency: 'XOF'
+                        });
+                    }
+                }, 2000);
+
+                const form = document.querySelector('.express-checkout-form');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+
+                        if (typeof trackWhenReady === 'function') {
+                            trackWhenReady('Purchase', {
+                                content_ids: ['{{ $product->id }}'],
+                                contents: [{
+                                    id: '{{ $product->id }}',
+                                    quantity: document.querySelector('input[name="quantity"]').value || 1,
+                                    item_price: {{ $product->price_sell }}
+                                }],
+                                currency: 'XOF',
+                                num_items: 1,
+                                value: {{ $product->price_sell }}
+                            });
+                        }
+
+                        setTimeout(function() {
+                            form.submit();
+                        }, 300);
+                    });
+                }
+            });
         </script>
     </body>
 </html>

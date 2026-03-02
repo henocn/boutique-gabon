@@ -17,6 +17,8 @@ class OrderUpdateRequest extends FormRequest
     {
         return [
             'status' => ['required', Rule::in(array_map(fn (OrderStatus $s) => $s->value, OrderStatus::cases()))],
+            'quantity' => ['sometimes', 'integer', 'min:1'],
+            'manager_note' => ['sometimes', 'nullable', 'string', 'max:1000'],
         ];
     }
 }

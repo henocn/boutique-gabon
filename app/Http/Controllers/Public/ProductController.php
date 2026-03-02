@@ -11,7 +11,7 @@ class ProductController extends Controller
 {
     public function show(Product $product): View
     {
-        $product->load(['productImages', 'category']);
+        $product->load(['productImages']);
 
         if ($product->status !== ProductStatus::Active) {
             abort(404);
