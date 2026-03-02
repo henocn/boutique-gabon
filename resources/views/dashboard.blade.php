@@ -1,4 +1,5 @@
 <x-app-layout>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <x-slot name="header">
         <div>
             <h1 class="h4 fw-bold mb-1">Dashboard</h1>
@@ -6,7 +7,70 @@
         </div>
     </x-slot>
 
-    <div class="row g-3">
+        <form method="GET" id="rangeForm" class="row g-3 mb-3 align-items-end">
+            <div class="col-auto">
+                <label class="form-label small">Début</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar2-event" viewBox="0 0 16 16">
+                          <path d="M6.5 7a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1h-3V7z"/>
+                          <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h.5A1.5 1.5 0 0 1 15 2.5v11A1.5 1.5 0 0 1 13.5 15h-11A1.5 1.5 0 0 1 1 13.5v-11A1.5 1.5 0 0 1 2.5 1H3v-.5a.5.5 0 0 1 .5-.5zM2.5 3a.5.5 0 0 0-.5.5V4h12v-.5a.5.5 0 0 0-.5-.5h-11zM2 5v8.5c0 .276.224.5.5.5H13.5a.5.5 0 0 0 .5-.5V5H2z"/>
+                        </svg>
+                    </span>
+                    <input type="date" name="start_date" class="form-control form-control-sm" value="{{ request()->query('start_date') }}">
+                </div>
+            </div>
+            <div class="col-auto">
+                <label class="form-label small">Fin</label>
+                <div class="input-group input-group-sm">
+                    <span class="input-group-text bg-white">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar2" viewBox="0 0 16 16">
+                          <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h.5A1.5 1.5 0 0 1 15 2.5v11A1.5 1.5 0 0 1 13.5 15h-11A1.5 1.5 0 0 1 1 13.5v-11A1.5 1.5 0 0 1 2.5 1H3v-.5a.5.5 0 0 1 .5-.5zM2.5 3a.5.5 0 0 0-.5.5V4h12v-.5a.5.5 0 0 0-.5-.5h-11zM2 5v8.5c0 .276.224.5.5.5H13.5a.5.5 0 0 0 .5-.5V5H2z"/>
+                        </svg>
+                    </span>
+                    <input type="date" name="end_date" class="form-control form-control-sm" value="{{ request()->query('end_date') }}">
+                </div>
+            </div>
+            <div class="col-auto d-flex align-items-end">
+                <button type="submit" class="btn btn-sm btn-primary" title="Filtrer" aria-label="Filtrer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                      <path d="M11 6a5 5 0 1 1-10 0 5 5 0 0 1 10 0zM6 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/>
+                      <path d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.415 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+                    </svg>
+                </button>
+                <a href="{{ route('dashboard') }}" class="btn btn-sm btn-outline-secondary ms-2" title="Réinitialiser" aria-label="Réinitialiser">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                      <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+                      <path d="M8 1.5a.5.5 0 0 1 .5.5v3.793l1.146-1.147a.5.5 0 0 1 .708.708L8.354 7.854a.5.5 0 0 1-.708 0L6.646 6.707a.5.5 0 1 1 .708-.708L8 6.293V2a.5.5 0 0 1 .5-.5z"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="col-12 mt-2">
+                <div class="btn-group" role="group" aria-label="Presets">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-days="7">7 jours</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-days="30">30 jours</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" data-days="90">90 jours</button>
+                </div>
+            </div>
+        </form>
+
+        @if(!empty($appliedRangeLabel))
+            <div class="mb-2">
+                <span class="badge bg-light text-dark border">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-calendar3 me-1" viewBox="0 0 16 16" style="vertical-align: -2px;">
+                      <path d="M14 4h-1V2.5a.5.5 0 0 0-1 0V4H4V2.5a.5.5 0 0 0-1 0V4H2a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1zM1 6v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6H1z"/>
+                      </svg>
+                    <strong class="me-2">Période :</strong> {{ $appliedRangeLabel }}
+                    <a href="{{ route('dashboard') }}" class="ms-2 text-decoration-none" title="Réinitialiser la période" aria-label="Réinitialiser la période">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-x-lg ms-1" viewBox="0 0 16 16" style="vertical-align: -2px;">
+                          <path d="M2.146 2.146a.5.5 0 0 1 .708 0L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854a.5.5 0 0 1 0-.708z"/>
+                        </svg>
+                    </a>
+                </span>
+            </div>
+        @endif
+
+        <div class="row g-3">
         <!-- Card 1: Commandes -->
         <div class="col-md-3">
             <div class="card card-soft p-3 h-100 border-2 border-warning-subtle" style="min-height: 210px;">
@@ -22,12 +86,10 @@
         <!-- Card 2: Produits & Catégories -->
         <div class="col-md-3">
             <div class="card card-soft p-3 h-100 border-2 border-warning-subtle" style="min-height: 210px;">
-                <p class="fw-semibold mb-2">Produits & Catégories</p>
+                <p class="fw-semibold mb-2">Produits</p>
                 <div class="d-flex flex-column gap-0">
                     <span class="small text-muted py-1">Produits actifs : <span class="fw-bold">{{ $activeProducts ?? 0 }}</span></span>
                     <span class="small text-muted py-1">Produits total : <span class="fw-bold">{{ $totalProducts ?? 0 }}</span></span>
-                    <span class="small text-muted py-1">Catégories actives : <span class="fw-bold">{{ $activeCategories ?? 0 }}</span></span>
-                    <span class="small text-muted py-1">Catégories total : <span class="fw-bold">{{ $totalCategories ?? 0 }}</span></span>
                 </div>
             </div>
         </div>
@@ -72,7 +134,7 @@
                                 @endif
                                 <div>
                                     <div class="fw-semibold">{{ $item->product?->name }}</div>
-                                    <div class="text-muted small">{{ $item->product?->category?->name }}</div>
+                                    <div class="text-muted small">{{ $item->product?->manager?->name }}</div>
                                 </div>
                             </div>
                             <span class="badge text-bg-secondary">{{ $item->sold_count }} ventes</span>
@@ -98,7 +160,7 @@
                                 @endif
                                 <div>
                                     <div class="fw-semibold">{{ $item['product']?->name }}</div>
-                                    <div class="text-muted small">{{ $item['product']?->category?->name }}</div>
+                                    <div class="text-muted small">{{ $item['product']?->manager?->name }}</div>
                                 </div>
                             </div>
                             <span class="badge text-bg-success">{{ number_format($item['revenue'], 0, ',', ' ') }} FCFA</span>
@@ -150,4 +212,29 @@
         </div>
     </div>
     @endif
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        (function () {
+            const startInput = document.querySelector('input[name="start_date"]');
+            const endInput = document.querySelector('input[name="end_date"]');
+            if (startInput && endInput && window.flatpickr) {
+                flatpickr(startInput, { dateFormat: 'Y-m-d', maxDate: 'today' });
+                flatpickr(endInput, { dateFormat: 'Y-m-d', maxDate: 'today' });
+            }
+
+            // Preset buttons
+            document.querySelectorAll('[data-days]').forEach(btn => {
+                btn.addEventListener('click', function () {
+                    const days = parseInt(this.getAttribute('data-days'), 10);
+                    const end = new Date();
+                    const start = new Date();
+                    start.setDate(end.getDate() - (days - 1));
+                    const fmt = d => d.toISOString().slice(0,10);
+                    startInput.value = fmt(start);
+                    endInput.value = fmt(end);
+                    document.getElementById('rangeForm').submit();
+                });
+            });
+        })();
+    </script>
 </x-app-layout>

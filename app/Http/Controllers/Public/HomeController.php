@@ -4,39 +4,22 @@ namespace App\Http\Controllers\Public;
 
 use App\Enums\ProductStatus;
 use App\Http\Controllers\Controller;
-use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
-    public function index(Request $request): View
+    public function index(): View
     {
-        $categories = Category::query()
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
+        $product = Product::where('status', ProductStatus::Active)
+            ->with(['productImages'])
+            ->inRandomOrder()
+            ->first();
 
-        $productsQuery = Product::query()
-            ->where('status', ProductStatus::Active)
-            ->with(['productImages', 'category']);
-
-        $search = trim((string) $request->query('q', ''));
-        if ($search !== '') {
-            $productsQuery->where(function ($query) use ($search): void {
-                $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('description_html', 'like', "%{$search}%");
-            });
+        if (!$product) {
+            abort(404, 'Aucun produit disponible');
         }
 
-        $selectedCategory = $request->query('category');
-        if ($selectedCategory) {
-            $productsQuery->where('category_id', $selectedCategory);
-        }
-
-        $products = $productsQuery->latest()->paginate(15)->withQueryString();
-
-        return view('welcome', compact('categories', 'products', 'search', 'selectedCategory'));
+        return view('welcome', compact('product'));
     }
 }

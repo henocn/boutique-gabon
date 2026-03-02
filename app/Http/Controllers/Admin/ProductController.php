@@ -6,7 +6,6 @@ use App\Enums\ProductStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ProductStoreRequest;
 use App\Http\Requests\ProductUpdateRequest;
-use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\User;
@@ -20,7 +19,7 @@ class ProductController extends Controller
     public function index(): View
     {
         $products = Product::query()
-            ->with(['category', 'manager', 'productImages'])
+            ->with(['manager', 'productImages'])
             ->latest()
             ->paginate(15);
 
@@ -30,7 +29,6 @@ class ProductController extends Controller
     public function create(): View
     {
         $product = new Product();
-        $categories = Category::query()->orderBy('name')->get();
         $managers = User::query()
             ->where('role', User::ROLE_MANAGER)
             ->where('is_active', true)
@@ -38,7 +36,7 @@ class ProductController extends Controller
             ->get();
         $statuses = ProductStatus::cases();
 
-        return view('admin.products.create', compact('product', 'categories', 'managers', 'statuses'));
+        return view('admin.products.create', compact('product', 'managers', 'statuses'));
     }
 
     public function store(ProductStoreRequest $request): RedirectResponse
@@ -74,7 +72,6 @@ class ProductController extends Controller
     public function edit(Product $product): View
     {
         $product->load('productImages');
-        $categories = Category::query()->orderBy('name')->get();
         $managers = User::query()
             ->where('role', User::ROLE_MANAGER)
             ->where('is_active', true)
@@ -82,7 +79,7 @@ class ProductController extends Controller
             ->get();
         $statuses = ProductStatus::cases();
 
-        return view('admin.products.edit', compact('product', 'categories', 'managers', 'statuses'));
+        return view('admin.products.edit', compact('product', 'managers', 'statuses'));
     }
 
     public function update(ProductUpdateRequest $request, Product $product): RedirectResponse

@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Events\NewOrder;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Cookie;
 
 class OrderModalController extends Controller
 {
@@ -39,10 +38,13 @@ class OrderModalController extends Controller
             'status' => \App\Enums\OrderStatus::New,
         ];
         // On retire client_address si la colonne n'existe pas
-        if (!\Schema::hasColumn('orders', 'client_address')) {
+        if (!\Illuminate\Support\Facades\Schema::hasColumn('orders', 'client_address')) {
             unset($orderData['client_address']);
         }
-        \App\Models\Order::create($orderData);
+        $order = \App\Models\Order::create($orderData);
+
+        // Dispatcher l'événement pour envoyer les notifications push
+        NewOrder::dispatch($order);
 
         // Stocker les infos client en session pour pré-remplir le formulaire
         session([

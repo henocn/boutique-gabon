@@ -17,7 +17,7 @@ class OrderController extends Controller
     {
         $user = Auth::user();
 
-        $tab = request('tab', 'active');
+        $tab = request('tab', 'to-process');
         $baseQuery = Order::query();
 
         if ($user->role === User::ROLE_MANAGER) {
@@ -27,41 +27,32 @@ class OrderController extends Controller
         }
 
         $counts = [
-            'new' => (clone $baseQuery)->where('status', OrderStatus::New)->count(),
-            'processed' => (clone $baseQuery)->where('status', OrderStatus::Processed)->count(),
+            'to_process' => (clone $baseQuery)->whereIn('status', [OrderStatus::New, OrderStatus::Remind])->count(),
             'unreachable' => (clone $baseQuery)->where('status', OrderStatus::Unreachable)->count(),
-            'delivered' => (clone $baseQuery)->where('status', OrderStatus::Delivered)->count(),
-            'other' => (clone $baseQuery)
-                ->whereNotIn('status', [
-                    OrderStatus::New,
-                    OrderStatus::Processed,
-                    OrderStatus::Unreachable,
-                    OrderStatus::Delivered,
-                ])
+            'processing' => (clone $baseQuery)->where('status', OrderStatus::Processing)->count(),
+            'delivered_today' => (clone $baseQuery)
+                ->where('status', OrderStatus::Delivered)
+                ->whereDate('updated_at', today())
                 ->count(),
         ];
 
-        $query = (clone $baseQuery)->with(['product.category', 'product.manager']);
+        $query = (clone $baseQuery)->with(['product.manager']);
 
         switch ($tab) {
             case 'unreachable':
                 $query->where('status', OrderStatus::Unreachable);
                 break;
-            case 'delivered':
-                $query->where('status', OrderStatus::Delivered);
+            case 'processing':
+                $query->where('status', OrderStatus::Processing);
                 break;
-            case 'other':
-                $query->whereNotIn('status', [
-                    OrderStatus::New,
-                    OrderStatus::Processed,
-                    OrderStatus::Unreachable,
-                    OrderStatus::Delivered,
-                ]);
+            case 'delivered-today':
+                $query->where('status', OrderStatus::Delivered)
+                    ->whereDate('updated_at', today());
                 break;
-            case 'active':
+            case 'to-process':
             default:
-                $tab = 'active';
-                $query->whereIn('status', [OrderStatus::New, OrderStatus::Processed]);
+                $tab = 'to-process';
+                $query->whereIn('status', [OrderStatus::New, OrderStatus::Remind]);
                 break;
         }
 

@@ -28,5 +28,11 @@
             </div>
         </main>
         @stack('scripts')
+        
+        @auth
+            @if(in_array(auth()->user()->role, ['admin', 'manager']))
+                <script src="{{ asset('js/push-notifications.js') }}"></script>
+            @endif
+        @endauth
     </body>
 </html>
